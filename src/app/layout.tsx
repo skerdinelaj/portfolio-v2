@@ -15,7 +15,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: `${profile.name}: Full Stack Developer`,
+  title: {
+    default: `${profile.name}: Full Stack Developer`,
+    template: `%s · ${profile.name}`,
+  },
   description: profile.tagline,
 };
 

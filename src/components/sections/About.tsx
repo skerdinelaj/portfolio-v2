@@ -5,7 +5,7 @@ import { profile } from "@/data/profile";
 
 export function About() {
   return (
-    <Section id="about" eyebrow="Get to know me" title="About me">
+    <Section eyebrow="Get to know me" title="About me">
       <div className="grid gap-10 md:grid-cols-[1fr_auto] md:items-center">
         <Reveal className="space-y-4 text-lg leading-relaxed text-muted">
           {profile.about.map((p, i) => (

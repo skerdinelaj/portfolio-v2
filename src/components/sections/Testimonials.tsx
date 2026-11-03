@@ -8,7 +8,7 @@ const placeholderStyle = "border-dashed opacity-60";
 
 export function Testimonials() {
   return (
-    <Section id="testimonials" eyebrow="What people say" title="Reviews & references">
+    <Section eyebrow="What people say" title="Reviews & references">
       <div className="grid gap-6 md:grid-cols-3">
         {testimonials.map((t, i) => (
           <Reveal key={i} delay={i * 0.08}>
@@ -41,7 +41,7 @@ export function Testimonials() {
         ))}
       </div>
 
-      <h3 className="mt-16 mb-6 text-center text-xl font-semibold">Reference letters</h3>
+      <h2 className="mt-16 mb-6 text-center text-xl font-semibold">Reference letters</h2>
       <div className="grid gap-6 md:grid-cols-2">
         {referenceLetters.map((l, i) => (
           <Reveal key={i} delay={i * 0.08}>

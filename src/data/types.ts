@@ -48,3 +48,11 @@ export type ReferenceLetter = {
   pdf?: string;
   placeholder?: boolean;
 };
+
+/** A top-level page, shown as a card on the home page and as a Navbar link. */
+export type SitePage = {
+  href: string;
+  label: string;
+  teaser: string;
+  icon: IconType;
+};

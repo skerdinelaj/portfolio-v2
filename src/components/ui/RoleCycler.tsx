@@ -14,7 +14,7 @@ export function RoleCycler({ roles }: { roles: string[] }) {
 
   return (
     <span className="relative inline-flex h-[1.4em] overflow-hidden align-bottom" aria-live="polite">
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" initial={false}>
         <motion.span
           key={roles[i]}
           initial={{ y: "100%", opacity: 0 }}

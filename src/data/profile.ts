@@ -5,7 +5,11 @@ export const profile = {
   email: "nskerdi@gmail.com",
   linkedin: "https://www.linkedin.com/in/skerdi-nelaj-289b651b7/",
   github: "https://github.com/skerdinelaj",
-  photo: "/profile.png",
+  photo: "/profile.webp",
+  /** Line drawing of the same photo (same size and framing); shown by default on the home page. */
+  photoDrawing: "/profile-2d.webp",
+  /** Shown in the home top bar. Set to null to hide it. */
+  status: "Open to work" as string | null,
   about: [
     "Full stack developer with 5+ years of experience building production React and TypeScript applications.",
     "At Okko I built a React Native / Expo social and jobs app together with its Node.js/Express backend (MongoDB, PostgreSQL). I bring strong React fundamentals (Redux, component architecture, API integration) to web and mobile, and deliver features end-to-end, including LLM-based features built on the Claude API.",

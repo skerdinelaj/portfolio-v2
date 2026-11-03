@@ -4,11 +4,11 @@ import { techGroups } from "@/data/tech";
 
 export function TechStack() {
   return (
-    <Section id="tech" eyebrow="What I work with" title="Tech stack">
+    <Section eyebrow="What I work with" title="Tech stack">
       <div className="grid gap-6 sm:grid-cols-2">
         {techGroups.map((group, gi) => (
           <Reveal key={group.category} delay={gi * 0.08} className="rounded-2xl border border-border bg-surface p-6">
-            <h3 className="mb-4 font-semibold">{group.category}</h3>
+            <h2 className="mb-4 font-semibold">{group.category}</h2>
             <ul className="grid grid-cols-2 gap-3">
               {group.items.map(({ name, icon: Icon, level }) => (
                 <li key={name} className="group flex items-center gap-3 rounded-xl p-2 transition hover:bg-accent-soft">

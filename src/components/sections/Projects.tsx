@@ -28,7 +28,7 @@ export function Projects() {
   const side = projects.filter((p) => !p.featured);
 
   return (
-    <Section id="projects" eyebrow="What I've built" title="Projects">
+    <Section eyebrow="What I've built" title="Projects">
       <div className="grid gap-6 md:grid-cols-3">
         {featured.map((p, i) => (
           <Reveal key={p.slug} delay={i * 0.08}>
@@ -56,7 +56,7 @@ export function Projects() {
         ))}
       </div>
 
-      <h3 className="mt-16 mb-6 text-center text-xl font-semibold">Side projects</h3>
+      <h2 className="mt-16 mb-6 text-center text-xl font-semibold">Side projects</h2>
       <div className="grid gap-6 sm:grid-cols-3">
         {side.map((p, i) => (
           <Reveal key={p.slug} delay={i * 0.08}>
@@ -67,7 +67,7 @@ export function Projects() {
                 </div>
               )}
               <div className="p-4">
-                <h4 className="font-semibold">{p.title}</h4>
+                <h3 className="font-semibold">{p.title}</h3>
                 <ProjectLinks p={p} />
               </div>
             </article>

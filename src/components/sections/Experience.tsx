@@ -1,21 +1,22 @@
 import { Reveal } from "@/components/ui/Reveal";
 import { Section } from "@/components/ui/Section";
 import { Tag } from "@/components/ui/Tag";
+import { Timeline, TimelineDot } from "@/components/ui/Timeline";
 import { experience } from "@/data/experience";
 
 export function Experience() {
   return (
-    <Section id="experience" eyebrow="Where I've worked" title="Experience">
-      <ol className="relative ml-3 border-l border-border">
+    <Section eyebrow="Where I've worked" title="Experience">
+      <Timeline>
         {experience.map((job, i) => (
           <li key={job.company} className="mb-10 ml-8 last:mb-0">
-            <span className="absolute -left-[7px] mt-2 size-3.5 rounded-full border-2 border-background bg-accent" />
+            <TimelineDot />
             <Reveal delay={i * 0.05} className="rounded-2xl border border-border bg-surface p-6">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3 className="text-lg font-semibold">
+                <h2 className="text-lg font-semibold">
                   {job.role} · {job.company}
                   {job.companyNote && <span className="font-normal text-muted"> ({job.companyNote})</span>}
-                </h3>
+                </h2>
                 <span className="text-sm text-muted">
                   {job.start} – {job.end}
                 </span>
@@ -39,7 +40,7 @@ export function Experience() {
             </Reveal>
           </li>
         ))}
-      </ol>
+      </Timeline>
     </Section>
   );
 }

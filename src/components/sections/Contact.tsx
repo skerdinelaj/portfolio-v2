@@ -12,7 +12,7 @@ export function Contact() {
   ];
 
   return (
-    <Section id="contact" eyebrow="Let's work together" title="Get in touch">
+    <Section eyebrow="Let's work together" title="Get in touch">
       <Reveal className="mx-auto max-w-xl text-center">
         <p className="text-muted">Open to new roles and freelance projects. The fastest way to reach me is email.</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">

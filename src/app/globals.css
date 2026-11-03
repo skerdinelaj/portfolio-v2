@@ -78,3 +78,36 @@ body {
   html { scroll-behavior: auto; }
   .marquee-track { animation: none; }
 }
+
+/* PhotoReveal: registered so the reveal circle can grow and shrink with a transition */
+@property --reveal-r {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+.reveal-photo {
+  --reveal-x: 50%;
+  --reveal-y: 50%;
+  transition: --reveal-r 180ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-photo {
+    transition: none;
+  }
+}
+
+/* Set by ThemeToggle for one frame so light/dark switches instantly instead of fading element by element */
+[data-theme-switching] *,
+[data-theme-switching] *::before,
+[data-theme-switching] *::after {
+  transition: none !important;
+}
+
+/* Home page on desktop: it never scrolls (the orbit ring owns the wheel), so stop Safari's rubber-band bounce */
+@media (min-width: 1024px) {
+  html:has([data-orbit-nav]) {
+    overscroll-behavior: none;
+  }
+}

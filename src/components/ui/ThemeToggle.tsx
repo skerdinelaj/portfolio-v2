@@ -6,7 +6,11 @@ export function ThemeToggle() {
   const toggle = () => {
     const root = document.documentElement;
     const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    // Switch instantly: otherwise every element with a colour transition fades on its own and the change feels laggy
+    root.setAttribute("data-theme-switching", "");
     root.setAttribute("data-theme", next);
+    void root.offsetHeight; // apply the new colours while transitions are off
+    requestAnimationFrame(() => root.removeAttribute("data-theme-switching"));
     try {
       localStorage.setItem("theme", next);
     } catch {}
