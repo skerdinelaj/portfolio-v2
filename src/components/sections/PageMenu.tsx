@@ -14,10 +14,13 @@ const MAX_SIZE = 384; // panel width/height in px
 const RADIUS = 0.34; // orbit radius as a fraction of the panel size
 const SPRING = { type: "spring", stiffness: 260, damping: 20 } as const;
 
-// Six dots around "SN", one per page: a preview of the orbit the menu opens into
+// Six dots around "SN", one per page: a preview of the orbit the menu opens into.
+// Rounded to 2 decimals: Math.sin/cos can differ in the last digits between Node (server render) and the browser,
+// and the style strings must match exactly or hydration fails (e.g. "75%" on the server vs "75.00000000000003%").
+const pct = (n: number) => `${Math.round(n * 100) / 100}%`;
 const DOTS = Array.from({ length: 6 }, (_, i) => {
   const a = (i / 6) * Math.PI * 2;
-  return { left: `${50 + Math.sin(a) * 50}%`, top: `${50 - Math.cos(a) * 50}%`, big: i % 2 === 0 };
+  return { left: pct(50 + Math.sin(a) * 50), top: pct(50 - Math.cos(a) * 50), big: i % 2 === 0 };
 });
 
 const isTyping = (t: EventTarget | null) => t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
