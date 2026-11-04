@@ -72,6 +72,9 @@ function OrbitItem({
   const opacity = useTransform(depth, (d) => 0.3 + 0.7 * d);
   // Front half passes in front of the photo and name; back half goes behind the photo (negative z, still above the page background)
   const zIndex = useTransform(rad, (r) => (Math.cos(r) > -0.2 ? 30 : -1));
+  // The card straight behind the head (cos ≈ -1) can't be grabbed or clicked: presses pass through to the photo.
+  // It stays in the tab order, and keyboard focus still turns it to the front.
+  const pointerEvents = useTransform(rad, (r) => (Math.cos(r) < -0.75 ? "none" : "auto"));
 
   return (
     <motion.div
@@ -79,7 +82,7 @@ function OrbitItem({
       // toward the back would also slide it sideways off its point on the ring
       className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none"
       // touch-action none: on touch screens the finger drags the ring instead of scrolling/zooming the page
-      style={{ x, y, scale, opacity, zIndex, touchAction: "none" }}
+      style={{ x, y, scale, opacity, zIndex, pointerEvents, touchAction: "none" }}
       // Pan = "the pointer moved past a few px while pressed". It reports movement and velocity but moves nothing itself.
       onPanStart={() => onDragStart(index)}
       onPan={(_: PointerEvent, info: PanInfo) => onDrag(info.delta)}
@@ -178,7 +181,7 @@ export function OrbitNav({ pages }: { pages: OrbitPage[] }) {
     // Which behaviour, decided once at grab time so it can't switch mid-drag (see dragToDegrees):
     // front half and the card straight behind the head follow the pointer; the back-left/right slots are a dial
     const cos = Math.cos(cardTheta(index, step, angle.get()));
-    const backSide = cos < -0.2 && cos > -0.75; // the two back slots sit at cos = -0.5; straight back is -1
+    const backSide = cos < -0.2 && cos > -0.75; // the two back slots sit at cos = -0.5; straight back (-1) can't be grabbed
     drag.current = { active: true, moved: true, index, mode: backSide ? "dial" : "follow" };
   };
   const onDrag = (delta: Point) => angle.set(angle.get() + dragToDegrees(delta));
