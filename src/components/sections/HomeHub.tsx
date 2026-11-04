@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { preload } from "react-dom";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { OrbitNav } from "@/components/sections/OrbitNav";
 import { LiveClock } from "@/components/ui/LiveClock";
@@ -34,7 +33,7 @@ function TopBar() {
       <div className="ml-auto flex items-stretch">
         {profile.status && (
           <p className="hidden items-center gap-2 border-l border-border px-4 text-muted sm:flex sm:px-6">
-            <span className="size-2 rounded-full bg-emerald-500" aria-hidden />
+            <span className="size-2 rounded-full bg-positive" aria-hidden />
             {profile.status}
           </p>
         )}
@@ -63,29 +62,26 @@ function PageLink({ page, index }: { page: SitePage; index: number }) {
 }
 
 export function HomeHub() {
-  // The drawing is the visible hero image but is loaded from CSS, so tell the browser about it early
-  preload(profile.photoDrawing, { as: "image", fetchPriority: "high" });
-
   return (
     <div className="flex min-h-dvh flex-col overflow-x-clip lg:h-dvh lg:overflow-hidden">
       <TopBar />
 
       <main className="relative flex-1">
         {/* Centre: photo standing on the bottom edge, title and name across it.
-            `isolate` + own background keep the name's blend mode inside this box. */}
+            `isolate` makes this box its own stacking context, so the orbit ring's back cards (negative z-index)
+            slide behind the photo but stay above this box's background. */}
         <div className="relative isolate h-[min(78svh,640px)] overflow-hidden bg-background lg:absolute lg:inset-0 lg:h-auto">
-          <Reveal className="absolute bottom-0 left-1/2 aspect-[3/4] h-[92%] -translate-x-1/2">
-            <div className="absolute inset-x-[10%] top-[12%] bottom-[30%] rounded-full bg-accent/25 blur-3xl" aria-hidden />
-            <PhotoReveal photo={profile.photo} drawing={profile.photoDrawing} alt={profile.name} sizes="(min-width: 1024px) 60vh, 70vw" />
+          <Reveal className="pointer-events-none absolute bottom-0 left-1/2 aspect-[1242/1253] h-[92%] -translate-x-1/2">
+            <div className="absolute inset-x-[10%] top-[12%] bottom-[30%] rounded-full bg-linear-to-br from-peach via-butter to-rose opacity-80 blur-3xl" aria-hidden />
+            <PhotoReveal photo={profile.photo} illustration={profile.illustration} alt={profile.name} sizes="(min-width: 1024px) 90vh, 600px" />
           </Reveal>
 
-          <div className="pointer-events-none absolute inset-x-0 top-[58%] flex flex-col items-center px-2 text-center">
+          <div className="pointer-events-none absolute inset-x-0 top-[48%] flex flex-col items-center px-2 text-center">
             <p className="rounded-sm bg-surface/90 px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] shadow-sm ring-1 ring-border sm:text-sm">
               <RoleCycler roles={profile.roles} />
             </p>
-            {/* White + difference blend: reads dark on the light page, light on the dark jacket, in both themes.
-                Nothing between this and the `isolate` box may set z-index/opacity, or the blend only sees an empty layer. */}
-            <h1 className="mt-3 text-[clamp(3rem,10vw,10rem)] leading-[0.9] font-bold tracking-tighter whitespace-nowrap text-white mix-blend-difference">
+            {/* Theme text colour with a page-coloured outline (`text-outline`, globals.css): readable over any image */}
+            <h1 className="text-outline mt-3 text-[clamp(3rem,10vw,10rem)] leading-[0.9] font-bold tracking-tighter whitespace-nowrap text-foreground">
               {profile.name}
             </h1>
           </div>

@@ -1,40 +1,61 @@
 @import "tailwindcss";
 
+/* Palette: warm pastels. Contrast of every text/background pair is checked to WCAG AA (4.5:1) in both themes. */
+
 /* `dark:` utilities follow the data-theme attribute set in layout.tsx */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 :root {
-  --background: #fafaf9;
-  --surface: #ffffff;
-  --foreground: #1c1917;
-  --muted: #57534e;
-  --border: #e7e5e4;
-  --accent: #4f46e5;
-  --accent-soft: #eef2ff;
+  --background: #fbf5ee;
+  --surface: #fffaf5;
+  --foreground: #3d2e28;
+  --muted: #77645a;
+  --border: #ecdfd2;
+  --accent: #a94c29;
+  --accent-soft: #feeadf;
+  /* Decorative pastels: areas and glows only, never text (too light for contrast) */
+  --peach: #ffd8c2;
+  --butter: #fbe8b8;
+  --rose: #f7d3da;
+  --sage: #d5e6cf;
+  --positive: #5f9a5c;
+  --text-shadow: rgb(61 46 40 / 0.18); /* shadows are dark in both themes: never derive them from --foreground */
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  --background: #0c0a09;
-  --surface: #1c1917;
-  --foreground: #f5f5f4;
-  --muted: #a8a29e;
-  --border: #292524;
-  --accent: #818cf8;
-  --accent-soft: #1e1b4b;
+  --background: #1e1814;
+  --surface: #29211c;
+  --foreground: #f6ece2;
+  --muted: #c3b1a2;
+  --border: #3d3129;
+  --accent: #f4a988;
+  --accent-soft: #4a2e22;
+  --peach: #7a4a36;
+  --butter: #6e5a2e;
+  --rose: #6e3d47;
+  --sage: #3f5a3c;
+  --positive: #9fd09a;
+  --text-shadow: rgb(0 0 0 / 0.5);
   color-scheme: dark;
 }
 
-/* No-JS fallback: follow the system setting */
+/* No-JS fallback: follow the system setting. Keep these values identical to [data-theme="dark"] above. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    --background: #0c0a09;
-    --surface: #1c1917;
-    --foreground: #f5f5f4;
-    --muted: #a8a29e;
-    --border: #292524;
-    --accent: #818cf8;
-    --accent-soft: #1e1b4b;
+    --background: #1e1814;
+    --surface: #29211c;
+    --foreground: #f6ece2;
+    --muted: #c3b1a2;
+    --border: #3d3129;
+    --accent: #f4a988;
+    --accent-soft: #4a2e22;
+    --peach: #7a4a36;
+    --butter: #6e5a2e;
+    --rose: #6e3d47;
+    --sage: #3f5a3c;
+    --positive: #9fd09a;
+  --text-shadow: rgb(0 0 0 / 0.5);
     color-scheme: dark;
   }
 }
@@ -47,6 +68,11 @@
   --color-border: var(--border);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-peach: var(--peach);
+  --color-butter: var(--butter);
+  --color-rose: var(--rose);
+  --color-sage: var(--sage);
+  --color-positive: var(--positive);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -110,4 +136,15 @@ body {
   html:has([data-orbit-nav]) {
     overscroll-behavior: none;
   }
+}
+
+/*
+ * Big text over images (the home page name): theme text colour + an outline in the page background colour.
+ * paint-order draws the stroke BEHIND the letters, so only its outer half shows and the letters keep their weight
+ * (a plain stroke is centred on the edge and eats into the glyph). The faint shadow adds a little depth.
+ */
+@utility text-outline {
+  -webkit-text-stroke: 0.09em var(--background);
+  paint-order: stroke fill;
+  text-shadow: 0 0.03em 0.12em var(--text-shadow);
 }

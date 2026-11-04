@@ -5,9 +5,10 @@ export const profile = {
   email: "nskerdi@gmail.com",
   linkedin: "https://www.linkedin.com/in/skerdi-nelaj-289b651b7/",
   github: "https://github.com/skerdinelaj",
-  photo: "/profile.webp",
-  /** Line drawing of the same photo (same size and framing); shown by default on the home page. */
-  photoDrawing: "/profile-2d.webp",
+  /** Cut-out photo, revealed under the pointer on the home page */
+  photo: "/avatar.webp",
+  /** Illustration of the same pose, shown by default. Must keep the exact same canvas (1242×1253) as `photo`. */
+  illustration: "/avatar-illustration.webp",
   /** Shown in the home top bar. Set to null to hide it. */
   status: "Open to work" as string | null,
   about: [
