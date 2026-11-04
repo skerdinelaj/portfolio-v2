@@ -110,9 +110,9 @@ function OrbitItem({
           isFront ? "ring-accent" : "cursor-grab ring-border"
         }`}
       >
-        <span className="font-mono text-sm font-bold text-accent">{String(index + 1).padStart(2, "0")}</span>
-        {isFront && <span className="mt-1 font-mono text-xs text-muted">{page.teaser}</span>}
-        <span className="font-display text-2xl font-medium tracking-tight transition-colors group-hover:text-accent xl:text-3xl">{page.label}</span>
+        <span className="text-sm font-bold text-foreground">{String(index + 1).padStart(2, "0")}</span>
+        {isFront && <span className="mt-1 text-xs text-foreground">{page.teaser}</span>}
+        <span className="text-2xl font-medium tracking-tight transition-colors xl:text-3xl">{page.label}</span>
         {isFront && (
           <span className="mt-2 inline-flex items-center gap-1.5 bg-accent px-2.5 py-1 text-xs font-medium uppercase tracking-wider text-white dark:text-background">
             Enter <FiArrowRight className="size-3" aria-hidden />
@@ -320,15 +320,15 @@ export function OrbitNav({ pages }: { pages: OrbitPage[] }) {
         </div>
       )}
 
-      <div className="pointer-events-auto absolute right-12 bottom-8 z-40 flex items-center gap-3 font-mono text-xs text-muted">
+      <div className="pointer-events-auto absolute right-12 bottom-8 z-40 flex items-center gap-3 text-xs text-foreground">
         <span>Scroll or drag to explore</span>
-        <button type="button" onClick={() => setTurns((t) => t - 1)} aria-label="Previous page" className="grid size-8 place-items-center rounded-full border border-border bg-surface transition hover:border-accent hover:text-accent">
+        <button type="button" onClick={() => setTurns((t) => t - 1)} aria-label="Previous page" className="grid size-8 place-items-center rounded-full border border-border bg-surface transition hover:border-accent">
           <FiChevronLeft className="size-4" />
         </button>
         <span className="tabular-nums" aria-live="polite">
           {String(front + 1).padStart(2, "0")} / {String(pages.length).padStart(2, "0")}
         </span>
-        <button type="button" onClick={() => setTurns((t) => t + 1)} aria-label="Next page" className="grid size-8 place-items-center rounded-full border border-border bg-surface transition hover:border-accent hover:text-accent">
+        <button type="button" onClick={() => setTurns((t) => t + 1)} aria-label="Next page" className="grid size-8 place-items-center rounded-full border border-border bg-surface transition hover:border-accent">
           <FiChevronRight className="size-4" />
         </button>
       </div>

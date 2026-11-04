@@ -14,7 +14,7 @@ export function Contact() {
   return (
     <Section eyebrow="Let's work together" title="Get in touch">
       <Reveal className="mx-auto max-w-xl text-center">
-        <p className="text-muted">Open to new roles and freelance projects. The fastest way to reach me is email.</p>
+        <p className="text-foreground">Open to new roles and freelance projects. The fastest way to reach me is email.</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           {links.map(({ href, label, icon: Icon }) => (
             <a
@@ -22,7 +22,7 @@ export function Contact() {
               href={href}
               target={href.startsWith("mailto:") ? undefined : "_blank"}
               rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-full border border-border bg-surface px-5 py-2.5 text-sm transition hover:border-accent hover:text-accent"
+              className="flex items-center gap-2 rounded-full border border-border bg-surface px-5 py-2.5 text-sm transition hover:border-accent"
             >
               <Icon className="size-4" /> {label}
             </a>

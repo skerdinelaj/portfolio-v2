@@ -15,16 +15,16 @@ export function Experience() {
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h2 className="text-lg font-semibold">
                   {job.role} · {job.company}
-                  {job.companyNote && <span className="font-normal text-muted"> ({job.companyNote})</span>}
+                  {job.companyNote && <span className="font-normal text-foreground"> ({job.companyNote})</span>}
                 </h2>
-                <span className="text-sm text-muted">
+                <span className="text-sm text-foreground">
                   {job.start} – {job.end}
                 </span>
               </div>
               <ul className="mt-4 space-y-3">
                 {job.highlights.map((h) => (
                   <li key={h.title}>
-                    <p className="text-muted">
+                    <p className="text-foreground">
                       <strong className="text-foreground">{h.title}:</strong> {h.text}
                     </p>
                     {h.tech && (

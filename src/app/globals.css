@@ -87,21 +87,8 @@
   --color-glow-1: var(--glow-1);
   --color-glow-2: var(--glow-2);
   --color-glow-3: var(--glow-3);
-  --font-sans: var(--font-outfit);
-  --font-mono: var(--font-geist-mono);
-  /* Fraunces with its "soft" axis turned up: rounded, storybook serif to match the illustration */
-  --font-display: var(--font-fraunces);
-  --font-display--font-variation-settings: "SOFT" 100;
-}
-
-/* Headings use the display font by default (utilities can still override) */
-@layer base {
-  h1,
-  h2,
-  h3 {
-    font-family: var(--font-display);
-    font-variation-settings: "SOFT" 100;
-  }
+  /* One font for the whole app: Fraunces (soft storybook serif). Its SOFT axis is set on <body> below. */
+  --font-sans: var(--font-fraunces);
 }
 
 html {
@@ -110,6 +97,7 @@ html {
 }
 
 body {
+  font-variation-settings: "SOFT" 100; /* rounded corners on every letter */
   background: var(--background);
   color: var(--foreground);
   transition: background-color 0.3s ease, color 0.3s ease;

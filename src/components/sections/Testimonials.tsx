@@ -13,25 +13,25 @@ export function Testimonials() {
         {testimonials.map((t, i) => (
           <Reveal key={i} delay={i * 0.08}>
             <figure className={`flex h-full flex-col rounded-2xl border border-border bg-surface p-6 ${t.placeholder ? placeholderStyle : ""}`}>
-              <span className="text-4xl leading-none text-accent" aria-hidden>
+              <span className="text-4xl leading-none text-foreground" aria-hidden>
                 &ldquo;
               </span>
-              <blockquote className="mt-2 flex-1 text-muted">{t.quote}</blockquote>
+              <blockquote className="mt-2 flex-1 text-foreground">{t.quote}</blockquote>
               <figcaption className="mt-6 flex items-center gap-3">
                 {t.photo ? (
                   <Image src={t.photo} alt={t.name} width={40} height={40} className="size-10 rounded-full object-cover" />
                 ) : (
-                  <div className="grid size-10 place-items-center rounded-full bg-accent-soft font-semibold text-accent">{t.name[0]}</div>
+                  <div className="grid size-10 place-items-center rounded-full bg-accent-soft font-semibold text-foreground">{t.name[0]}</div>
                 )}
                 <div className="text-sm">
                   {t.linkedin ? (
-                    <a href={t.linkedin} target="_blank" rel="noopener noreferrer" className="font-semibold hover:text-accent">
+                    <a href={t.linkedin} target="_blank" rel="noopener noreferrer" className="font-semibold underline-offset-4 hover:underline">
                       {t.name}
                     </a>
                   ) : (
                     <p className="font-semibold">{t.name}</p>
                   )}
-                  <p className="text-muted">
+                  <p className="text-foreground">
                     {t.role}, {t.company}
                   </p>
                 </div>
@@ -46,17 +46,17 @@ export function Testimonials() {
         {referenceLetters.map((l, i) => (
           <Reveal key={i} delay={i * 0.08}>
             <article className={`flex h-full flex-col rounded-2xl border border-border bg-surface p-6 ${l.placeholder ? placeholderStyle : ""}`}>
-              <FiFileText className="size-6 text-accent" aria-hidden />
-              <p className="mt-4 flex-1 italic text-muted">&ldquo;{l.excerpt}&rdquo;</p>
+              <FiFileText className="size-6 text-foreground" aria-hidden />
+              <p className="mt-4 flex-1 italic text-foreground">&ldquo;{l.excerpt}&rdquo;</p>
               <p className="mt-4 text-sm">
                 <span className="font-semibold">{l.author}</span>
-                <span className="text-muted">
+                <span className="text-foreground">
                   {" "}
                   · {l.role}, {l.company}
                 </span>
               </p>
               {l.pdf && (
-                <a href={l.pdf} target="_blank" rel="noopener noreferrer" className="mt-4 self-start rounded-full border border-border px-4 py-1.5 text-sm transition hover:border-accent hover:text-accent">
+                <a href={l.pdf} target="_blank" rel="noopener noreferrer" className="mt-4 self-start rounded-full border border-border px-4 py-1.5 text-sm transition hover:border-accent">
                   Read full letter (PDF)
                 </a>
               )}

@@ -13,9 +13,9 @@ function PageLink({ page, index }: { page: SitePage; index: number }) {
       href={page.href}
       className="group flex w-full flex-col rounded-2xl border border-border bg-surface p-4 transition hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
     >
-      <span className="font-mono text-sm font-bold text-accent">{String(index + 1).padStart(2, "0")}</span>
-      <span className="mt-1 font-mono text-xs text-muted">{page.teaser}</span>
-      <span className="mt-1 font-display text-xl font-medium tracking-tight transition group-hover:text-accent">{page.label}</span>
+      <span className="text-sm font-bold text-foreground">{String(index + 1).padStart(2, "0")}</span>
+      <span className="mt-1 text-xs text-foreground">{page.teaser}</span>
+      <span className="mt-1 text-xl font-medium tracking-tight transition">{page.label}</span>
     </Link>
   );
 }

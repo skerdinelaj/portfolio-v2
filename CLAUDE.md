@@ -84,14 +84,15 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 
 - Tailwind v4 utilities only. No CSS modules, styled-components, or inline `style` except for values computed at runtime.
 - Palette is **warm pastel**. Use the design tokens from `globals.css`:
-  - Text and UI: `background`, `surface`, `foreground`, `muted`, `border`, `accent` (deep sage in light mode, pastel mint in dark mode), `accent-soft`, `positive`.
+  - **All text uses `text-foreground`** (espresso in light mode, cream in dark mode). No `text-muted`/`text-accent` and no colour change on hover: show hover with borders, lift or underline instead. Hierarchy comes from size and weight.
+  - UI shapes: `background`, `surface`, `border`, `accent` (sage: buttons, timeline, orbit dots, progress bar, hover borders, focus rings), `accent-soft` (tag/pill fills), `positive`. `muted` is kept in the tokens but not used for text.
   - Decoration only, never text (too light for contrast): `peach`, `butter`, `rose`, `sage`, and `glow-1/2/3` (the light behind the avatar: sun pastels in light mode, moonlight blues in dark mode).
   - Never hardcode hex or Tailwind palette colours (`bg-emerald-500` and the like) in components.
   - A new token goes in **three** places in `globals.css`: `:root`, `[data-theme="dark"]`, and the no-JS `prefers-color-scheme` fallback.
   - Any new text/background pair must pass **WCAG AA, 4.5:1** (3:1 for large text and UI shapes) in both themes. Measure it, don't eyeball it (see `LEARNING.md`, "Warm pastel palette").
 - Dark mode is driven by `data-theme` on `<html>`, set by the inline script in `layout.tsx` before first paint. `dark:` variants follow that attribute, not `prefers-color-scheme`. Don't remove that script or `suppressHydrationWarning`.
 - Layout: sections are `max-w-5xl` with `px-4 sm:px-6`. Design mobile-first and check that nothing scrolls horizontally at 360px.
-- Fonts come from `next/font/google` via CSS variables: Outfit (body, `font-sans`), Fraunces with `"SOFT" 100` (headings h1–h3 by default, or `font-display`), Geist Mono (numbers and small labels, `font-mono`). Never use a `<link>` to Google Fonts.
+- **One font for the whole app: Fraunces** (variable, `axes: ["SOFT", "opsz"]`), loaded with `next/font/google` in `layout.tsx` and mapped to `--font-sans`. `"SOFT" 100` is set on `<body>`. Don't add a second font (no mono, no display font) or `font-mono`/`font-serif` classes. Never use a `<link>` to Google Fonts.
 
 ## Animation
 

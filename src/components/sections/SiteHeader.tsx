@@ -19,12 +19,12 @@ export function SiteHeader() {
 
       <div className="ml-auto flex items-stretch">
         {profile.status && (
-          <p className="hidden items-center gap-2 border-l border-border px-4 text-muted sm:flex sm:px-6">
+          <p className="hidden items-center gap-2 border-l border-border px-4 text-foreground sm:flex sm:px-6">
             <span className="size-2 rounded-full bg-positive" aria-hidden />
             {profile.status}
           </p>
         )}
-        <p className="hidden items-center border-l border-border px-4 text-muted md:flex md:px-6">
+        <p className="hidden items-center border-l border-border px-4 text-foreground md:flex md:px-6">
           <LiveClock />
         </p>
         <div className="flex items-center border-l border-border px-3 sm:px-4">

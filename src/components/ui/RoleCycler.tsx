@@ -21,7 +21,7 @@ export function RoleCycler({ roles }: { roles: string[] }) {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: "-100%", opacity: 0 }}
           transition={{ duration: 0.35 }}
-          className="text-accent"
+          className="text-foreground"
         >
           {roles[i]}
         </motion.span>

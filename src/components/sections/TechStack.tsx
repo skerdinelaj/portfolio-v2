@@ -12,10 +12,10 @@ export function TechStack() {
             <ul className="grid grid-cols-2 gap-3">
               {group.items.map(({ name, icon: Icon, level }) => (
                 <li key={name} className="group flex items-center gap-3 rounded-xl p-2 transition hover:bg-accent-soft">
-                  <Icon className="size-6 shrink-0 text-muted transition group-hover:scale-110 group-hover:text-accent" aria-hidden />
+                  <Icon className="size-6 shrink-0 text-foreground transition group-hover:scale-110" aria-hidden />
                   <div>
                     <p className="text-sm font-medium">{name}</p>
-                    <p className="text-xs text-muted">{level}</p>
+                    <p className="text-xs text-foreground">{level}</p>
                   </div>
                 </li>
               ))}

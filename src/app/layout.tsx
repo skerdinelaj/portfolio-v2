@@ -1,25 +1,15 @@
 import type { Metadata } from "next";
-import { Fraunces, Geist_Mono, Outfit } from "next/font/google";
+import { Fraunces } from "next/font/google";
 import { SiteHeader } from "@/components/sections/SiteHeader";
 import { MotionProvider } from "@/components/ui/MotionProvider";
 import { profile } from "@/data/profile";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-});
-
-// Variable font: weights plus the extra SOFT (rounded corners) and opsz (optical size) axes
+// The app's only font. Variable font: weights plus the extra SOFT (rounded corners) and opsz (optical size) axes
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],
   axes: ["SOFT", "opsz"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -38,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${outfit.variable} ${fraunces.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${fraunces.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

@@ -101,10 +101,10 @@ export function PageMenu({ pages, avatar, name, initials }: { pages: MenuPage[];
         // The visible text "SN" stays at the start of the name, so voice control ("click SN") still works
         aria-label={`${initials}, menu`}
         onClick={toggle}
-        className="group flex items-center border-r border-border px-3 transition hover:text-accent focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent aria-expanded:text-accent sm:px-5"
+        className="group flex items-center border-r border-border px-3 transition focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent sm:px-5"
       >
         <span className="relative grid size-11 place-items-center">
-          <span className="font-display text-base font-semibold tracking-tight">{initials}</span>
+          <span className="text-base font-semibold tracking-tight">{initials}</span>
           {/* The orbit: spreads out on hover; when the menu opens the dots fly outward and fade, as if they became the pills.
               Two layers because both use `transform`: the outer one scales, the inner one spins. */}
           <span
@@ -193,9 +193,9 @@ export function PageMenu({ pages, avatar, name, initials }: { pages: MenuPage[];
                         onClick={() => setOpen(false)}
                         onPointerEnter={() => setHovered(page)}
                         onFocus={() => setHovered(page)}
-                        className="flex -translate-1/2 items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-medium whitespace-nowrap shadow-sm transition hover:-translate-y-[calc(50%+3px)] hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent aria-[current=page]:border-accent aria-[current=page]:bg-accent-soft"
+                        className="flex -translate-1/2 items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-medium whitespace-nowrap shadow-sm transition hover:-translate-y-[calc(50%+3px)] hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent aria-[current=page]:border-accent aria-[current=page]:bg-accent-soft"
                       >
-                        <span className="font-mono text-[11px] font-bold text-accent">{String(i + 1).padStart(2, "0")}</span>
+                        <span className="text-[11px] font-bold text-foreground">{String(i + 1).padStart(2, "0")}</span>
                         {page.label}
                       </Link>
                     </motion.li>
@@ -204,7 +204,7 @@ export function PageMenu({ pages, avatar, name, initials }: { pages: MenuPage[];
               </ul>
 
               {/* Caption: what the hovered page is about */}
-              <p aria-hidden className="absolute inset-x-0 bottom-3 truncate px-6 text-center text-xs text-muted">
+              <p aria-hidden className="absolute inset-x-0 bottom-3 truncate px-6 text-center text-xs text-foreground">
                 {hovered ? hovered.teaser : `Pick a page · ${name}`}
               </p>
             </motion.nav>

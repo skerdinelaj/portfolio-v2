@@ -10,12 +10,12 @@ function ProjectLinks({ p }: { p: Project }) {
   return (
     <div className="mt-4 flex gap-4 text-sm">
       {p.github && (
-        <a href={p.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-muted hover:text-accent">
+        <a href={p.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 underline-offset-4 hover:underline">
           <FiGithub /> Code
         </a>
       )}
       {p.live && (
-        <a href={p.live} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-muted hover:text-accent">
+        <a href={p.live} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 underline-offset-4 hover:underline">
           <FiExternalLink /> Live demo
         </a>
       )}
@@ -37,13 +37,13 @@ export function Projects() {
                 {p.image ? (
                   <Image src={p.image} alt={p.title} fill className="object-cover transition duration-500 group-hover:scale-105" />
                 ) : (
-                  <div className="grid h-full place-items-center text-sm text-accent">Screenshot coming soon</div>
+                  <div className="grid h-full place-items-center text-sm text-foreground">Screenshot coming soon</div>
                 )}
               </div>
               <div className="flex flex-1 flex-col p-5">
-                {p.company && <p className="text-xs font-medium uppercase tracking-wider text-accent">{p.company}</p>}
+                {p.company && <p className="text-xs font-medium uppercase tracking-wider text-foreground">{p.company}</p>}
                 <h3 className="mt-1 text-lg font-semibold">{p.title}</h3>
-                <p className="mt-2 flex-1 text-sm text-muted">{p.summary}</p>
+                <p className="mt-2 flex-1 text-sm text-foreground">{p.summary}</p>
                 <div className="mt-4 flex flex-wrap gap-1.5">
                   {p.tech.map((t) => (
                     <Tag key={t}>{t}</Tag>
