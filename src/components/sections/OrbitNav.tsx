@@ -28,6 +28,13 @@ const ringRadiusX = (w: number) => Math.min(w * RADIUS_X, MAX_RADIUS_X);
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 type Point = { x: number; y: number };
 
+/**
+ * Where card `index` sits on the ring, in radians (0 = front). Page i is i steps to the RIGHT of the front,
+ * so "next" (angle + step) moves every card left and brings the next number in from the right: 01 → 02 → 03.
+ * Note dθ/d(angle) = −1: turning the ring by +x° moves each card by −x° along it.
+ */
+const cardTheta = (index: number, step: number, angleDeg: number) => ((index * step - angleDeg) * Math.PI) / 180;
+
 function OrbitItem({
   page,
   index,
@@ -54,8 +61,8 @@ function OrbitItem({
   /** True if the press that just ended was a drag, so its click must not open the page */
   wasDragged: () => boolean;
 }) {
-  // Item i sits `i` steps to the left of the front; the whole ring turns by `angle` degrees
-  const rad = useTransform(angle, (a) => ((a - index * step) * Math.PI) / 180);
+  // Item i sits `i` steps to the right of the front (see cardTheta); the whole ring turns by `angle` degrees
+  const rad = useTransform(angle, (a) => cardTheta(index, step, a));
   const rx = ringRadiusX(size.w);
   const x = useTransform(rad, (r) => Math.sin(r) * rx);
   // Plus: the front of the ring (cos = 1) is at the bottom, below the name; the back passes behind the head
@@ -145,11 +152,13 @@ export function OrbitNav({ pages }: { pages: OrbitPage[] }) {
   const dragToDegrees = (d: Point) => {
     // Back-left / back-right cards turn like a dial: the left/right part of the drag turns the ring exactly as a
     // front drag would (user's choice; following the path felt reversed there)
-    if (drag.current.mode === "dial") return toDeg(d.x / ringRadiusX(size.w));
-    const theta = ((angle.get() - drag.current.index * step) * Math.PI) / 180;
+    // Both branches work out the card's move along the ring (dθ) in screen terms; the ring angle moves by −dθ
+    // (cardTheta), hence the minus signs. On screen everything behaves exactly as before the order was reversed.
+    if (drag.current.mode === "dial") return -toDeg(d.x / ringRadiusX(size.w)); // drag right = front cards move right
+    const theta = cardTheta(drag.current.index, step, angle.get());
     const tx = ringRadiusX(size.w) * Math.cos(theta);
     const ty = -size.h * RADIUS_Y * Math.sin(theta);
-    return toDeg((d.x * tx + d.y * ty) / (tx * tx + ty * ty));
+    return -toDeg((d.x * tx + d.y * ty) / (tx * tx + ty * ty));
   };
 
   // Spring the ring to its new position
@@ -168,7 +177,7 @@ export function OrbitNav({ pages }: { pages: OrbitPage[] }) {
     animation.current?.stop(); // grab the ring where it is, even mid-spin
     // Which behaviour, decided once at grab time so it can't switch mid-drag (see dragToDegrees):
     // front half and the card straight behind the head follow the pointer; the back-left/right slots are a dial
-    const cos = Math.cos(((angle.get() - index * step) * Math.PI) / 180);
+    const cos = Math.cos(cardTheta(index, step, angle.get()));
     const backSide = cos < -0.2 && cos > -0.75; // the two back slots sit at cos = -0.5; straight back is -1
     drag.current = { active: true, moved: true, index, mode: backSide ? "dial" : "follow" };
   };
