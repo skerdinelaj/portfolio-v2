@@ -36,13 +36,13 @@ This project is also a course: the owner is an experienced React developer learn
 ```
 src/
   app/
-    layout.tsx         Root: <html>, fonts, theme script, MotionProvider
-    page.tsx           Home hub (renders HomeHub). One screen, no Navbar/Footer
+    layout.tsx         Root: <html>, fonts, theme script, MotionProvider, SiteHeader (one header for every route)
+    page.tsx           Home hub (renders HomeHub). One screen below the header, no Footer
     (pages)/           Route group for /about /experience /tech /projects /reviews /contact
-      layout.tsx       ScrollProgress + Navbar + <main> + Footer for every inner page
+      layout.tsx       ScrollProgress + <main> + Footer for every inner page
     globals.css        Tokens, dark mode, PhotoReveal + theme-switch + overscroll rules
   components/
-    sections/          One component per page / big block (HomeHub, OrbitNav, Navbar, About, Projects, ...)
+    sections/          One component per page / big block (SiteHeader, PageMenu, HomeHub, OrbitNav, About, Projects, ...)
     ui/                Reusable building blocks (Section, Reveal, PhotoReveal, Timeline, ScrollProgress, ...)
   data/                Static content + types.ts (the content model). pages.ts lists the six pages
 LEARNING.md            Learning journal: one entry per meaningful change (see Teaching mode)
@@ -50,7 +50,7 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 ```
 
 - `src/app/` holds routing files only. Put components in `src/components/` and content in `src/data/`, not next to routes.
-- A new page: add `src/app/(pages)/<slug>/page.tsx` (export `metadata` with a `title`), put its content in `components/sections/<Name>.tsx` wrapped in `<Section eyebrow title>` (renders the page's single `<h1>`), and add it to `src/data/pages.ts`. That one list feeds the home ring, the mobile card grid and the Navbar.
+- A new page: add `src/app/(pages)/<slug>/page.tsx` (export `metadata` with a `title`), put its content in `components/sections/<Name>.tsx` wrapped in `<Section eyebrow title>` (renders the page's single `<h1>`), and add it to `src/data/pages.ts`. That one list feeds the home ring, the mobile card grid and the header Menu.
 - Home page order and ring position come from the order in `pages.ts`.
 - A component goes in `ui/` only when two or more sections use it, or it is a generic primitive. Otherwise keep it inside its section file.
 - Deeper routes (e.g. `/projects/[slug]`) go inside `(pages)/` so they get the shared layout; keep `data/` as the source of truth.
@@ -58,7 +58,8 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 ## Server vs. Client Components
 
 - Everything is a Server Component by default. Keep it that way.
-- Add `"use client"` only to the smallest leaf that needs state, effects, event handlers, browser APIs, or Motion. Existing client leaves: `Reveal`, `MotionProvider`, `RoleCycler`, `CountUp`, `ThemeToggle`, `LiveClock`, `PhotoReveal`, `Timeline`, `ScrollProgress`, `Navbar`, `OrbitNav`.
+- Add `"use client"` only to the smallest leaf that needs state, effects, event handlers, browser APIs, or Motion. Existing client leaves: `Reveal`, `MotionProvider`, `RoleCycler`, `CountUp`, `ThemeToggle`, `LiveClock`, `PhotoReveal`, `Timeline`, `ScrollProgress`, `AutoHideHeader`, `PageMenu`, `OrbitNav`.
+- The header is `SiteHeader` in the root layout, so it stays mounted across navigations. Don't add another header to a page or to `(pages)/layout.tsx`. It is `h-14`, and `HomeHub` subtracts that height on desktop (`h-[calc(100dvh-3.5rem)]`) so home never scrolls: change both together.
 - Never mark a whole section `"use client"` just to animate it. Wrap the animated part in `<Reveal>` or a dedicated client leaf, and pass server-rendered content as `children`.
 - Props passed into Client Components must be serializable. Don't pass react-icons components (functions) or other non-serializable values across the boundary. Render the icon on the server side, or pass a string key and resolve it inside the client component (see how `HomeHub` strips `icon` before passing pages to `OrbitNav`).
 - Import data from `src/data/` in Server Components and pass only what's needed down to client leaves.
@@ -83,14 +84,14 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 
 - Tailwind v4 utilities only. No CSS modules, styled-components, or inline `style` except for values computed at runtime.
 - Palette is **warm pastel**. Use the design tokens from `globals.css`:
-  - Text and UI: `background`, `surface`, `foreground`, `muted`, `border`, `accent` (terracotta in light mode, pastel peach in dark mode), `accent-soft`, `positive`.
-  - Decoration only, never text (too light for contrast): `peach`, `butter`, `rose`, `sage`.
+  - Text and UI: `background`, `surface`, `foreground`, `muted`, `border`, `accent` (deep sage in light mode, pastel mint in dark mode), `accent-soft`, `positive`.
+  - Decoration only, never text (too light for contrast): `peach`, `butter`, `rose`, `sage`, and `glow-1/2/3` (the light behind the avatar: sun pastels in light mode, moonlight blues in dark mode).
   - Never hardcode hex or Tailwind palette colours (`bg-emerald-500` and the like) in components.
   - A new token goes in **three** places in `globals.css`: `:root`, `[data-theme="dark"]`, and the no-JS `prefers-color-scheme` fallback.
   - Any new text/background pair must pass **WCAG AA, 4.5:1** (3:1 for large text and UI shapes) in both themes. Measure it, don't eyeball it (see `LEARNING.md`, "Warm pastel palette").
 - Dark mode is driven by `data-theme` on `<html>`, set by the inline script in `layout.tsx` before first paint. `dark:` variants follow that attribute, not `prefers-color-scheme`. Don't remove that script or `suppressHydrationWarning`.
 - Layout: sections are `max-w-5xl` with `px-4 sm:px-6`. Design mobile-first and check that nothing scrolls horizontally at 360px.
-- Fonts come from `next/font/google` (Geist, Geist Mono) via CSS variables. Never use a `<link>` to Google Fonts.
+- Fonts come from `next/font/google` via CSS variables: Outfit (body, `font-sans`), Fraunces with `"SOFT" 100` (headings h1–h3 by default, or `font-display`), Geist Mono (numbers and small labels, `font-mono`). Never use a `<link>` to Google Fonts.
 
 ## Animation
 

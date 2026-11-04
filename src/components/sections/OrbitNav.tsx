@@ -109,7 +109,7 @@ function OrbitItem({
       >
         <span className="font-mono text-sm font-bold text-accent">{String(index + 1).padStart(2, "0")}</span>
         {isFront && <span className="mt-1 font-mono text-xs text-muted">{page.teaser}</span>}
-        <span className="text-2xl font-medium tracking-tight transition-colors group-hover:text-accent xl:text-3xl">{page.label}</span>
+        <span className="font-display text-2xl font-medium tracking-tight transition-colors group-hover:text-accent xl:text-3xl">{page.label}</span>
         {isFront && (
           <span className="mt-2 inline-flex items-center gap-1.5 bg-accent px-2.5 py-1 text-xs font-medium uppercase tracking-wider text-white dark:text-background">
             Enter <FiArrowRight className="size-3" aria-hidden />

@@ -1,12 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Geist_Mono, Outfit } from "next/font/google";
+import { SiteHeader } from "@/components/sections/SiteHeader";
 import { MotionProvider } from "@/components/ui/MotionProvider";
 import { profile } from "@/data/profile";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
+});
+
+// Variable font: weights plus the extra SOFT (rounded corners) and opsz (optical size) axes
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  axes: ["SOFT", "opsz"],
 });
 
 const geistMono = Geist_Mono({
@@ -30,13 +38,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${outfit.variable} ${fraunces.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-full flex flex-col font-sans">
-        <MotionProvider>{children}</MotionProvider>
+        <MotionProvider>
+          {/* In the root layout so it stays mounted across every navigation (home included) */}
+          <SiteHeader />
+          {children}
+        </MotionProvider>
       </body>
     </html>
   );
