@@ -4,6 +4,21 @@
 
 Personal portfolio: a one-screen home hub plus six content pages. Next.js 16.4 (App Router, Turbopack), React 19.3, TypeScript (strict), Tailwind CSS v4, Motion, react-icons. No backend, database, or CMS: all content is static TypeScript in `src/data/`.
 
+## Teaching mode (always on)
+
+This project is also a course: the owner is an experienced React developer learning Next.js by building it. Every change is explained, not just made.
+
+- **Before changing code**, explain briefly:
+  1. what we'll do and how (files, approach);
+  2. the realistic alternatives (2–3) and their trade-offs;
+  3. why the chosen option is best here;
+  4. the plain-React vs Next.js difference whenever the change touches a Next feature (routing, layouts, Server/Client Components, caching, `next/image`, `next/font`, metadata, Server Actions, prefetching).
+- **After the change**, explain what each touched file now does and any new concept, in plain words. Link the relevant guide in `node_modules/next/dist/docs/` when one applies.
+- **Append an entry to `LEARNING.md`** for every meaningful change, using the template at the bottom of that file. Trivial edits (typos, copy) don't need one.
+- Skip React basics (hooks, state, props). Spend the words on Next.js specifics, browser/CSS mechanics, performance and accessibility reasons.
+- When unsure which option to take, give a recommendation and say why, don't just list options.
+- If the user asks "why" about something already built, answer from `LEARNING.md` first and extend the entry if the answer adds something.
+
 ## Before writing code
 
 - This Next.js version differs from your training data. Read the matching guide in `node_modules/next/dist/docs/` before using any Next.js API, file convention, or config option. Trust those docs over memory, and heed deprecation notices.
@@ -30,7 +45,8 @@ src/
     sections/          One component per page / big block (HomeHub, OrbitNav, Navbar, About, Projects, ...)
     ui/                Reusable building blocks (Section, Reveal, PhotoReveal, Timeline, ScrollProgress, ...)
   data/                Static content + types.ts (the content model). pages.ts lists the six pages
-public/                profile.webp (cut-out photo), profile-2d.webp (ink-only line drawing), projects/, logos/, ...
+LEARNING.md            Learning journal: one entry per meaningful change (see Teaching mode)
+public/                avatar.webp (cut-out photo), avatar-illustration.webp (aligned illustration), projects/, logos/, ...
 ```
 
 - `src/app/` holds routing files only. Put components in `src/components/` and content in `src/data/`, not next to routes.
@@ -66,7 +82,12 @@ public/                profile.webp (cut-out photo), profile-2d.webp (ink-only l
 ## Styling
 
 - Tailwind v4 utilities only. No CSS modules, styled-components, or inline `style` except for values computed at runtime.
-- Use the design tokens from `globals.css` (`bg-background`, `bg-surface`, `text-foreground`, `text-muted`, `border-border`, `text-accent`, `bg-accent-soft`). Never hardcode hex colors in components. Add a new token to both `:root` and `[data-theme="dark"]` when one is needed.
+- Palette is **warm pastel**. Use the design tokens from `globals.css`:
+  - Text and UI: `background`, `surface`, `foreground`, `muted`, `border`, `accent` (terracotta in light mode, pastel peach in dark mode), `accent-soft`, `positive`.
+  - Decoration only, never text (too light for contrast): `peach`, `butter`, `rose`, `sage`.
+  - Never hardcode hex or Tailwind palette colours (`bg-emerald-500` and the like) in components.
+  - A new token goes in **three** places in `globals.css`: `:root`, `[data-theme="dark"]`, and the no-JS `prefers-color-scheme` fallback.
+  - Any new text/background pair must pass **WCAG AA, 4.5:1** (3:1 for large text and UI shapes) in both themes. Measure it, don't eyeball it (see `LEARNING.md`, "Warm pastel palette").
 - Dark mode is driven by `data-theme` on `<html>`, set by the inline script in `layout.tsx` before first paint. `dark:` variants follow that attribute, not `prefers-color-scheme`. Don't remove that script or `suppressHydrationWarning`.
 - Layout: sections are `max-w-5xl` with `px-4 sm:px-6`. Design mobile-first and check that nothing scrolls horizontally at 360px.
 - Fonts come from `next/font/google` (Geist, Geist Mono) via CSS variables. Never use a `<link>` to Google Fonts.
@@ -84,6 +105,7 @@ public/                profile.webp (cut-out photo), profile-2d.webp (ink-only l
 ## Images, icons, assets
 
 - Use `next/image` for every image, with `width`/`height` (or `fill` + `sizes`) and a meaningful `alt` (`alt=""` only for decorative images). `priority` is deprecated in Next 16: for the above-the-fold hero image use `loading="eager"` or `fetchPriority="high"`, and leave every other image on the default lazy loading.
+- The home hero is `PhotoReveal`: `avatar-illustration.webp` is shown, and `avatar.webp` (the real photo) shows through a circle under the pointer. The two files must have the **exact same canvas size and framing** (currently 1242×1253), and the photo box in `HomeHub` uses that aspect ratio. Replacing either image means re-aligning the other (see `LEARNING.md`, "New avatar images").
 - Put assets in the matching `public/` subfolder. Keep project screenshots under ~300 KB; prefer `.jpg`/`.webp` for photos.
 - Icons come from `react-icons` (`fi` for UI, `fa` for brands, `si` for tech logos). Don't add another icon library.
 
@@ -111,6 +133,6 @@ public/                profile.webp (cut-out photo), profile-2d.webp (ink-only l
 
 1. `npm run lint` and `npm run build` pass with no errors or new warnings.
 2. No new blocking-route or instant-navigation insights in the dev overlay.
-3. The change looks right in light and dark mode, on mobile and desktop widths, and with reduced motion enabled. Check light mode explicitly on the home page: the name's `mix-blend-difference` breaks silently if any wrapper between it and the `isolate` box gets a z-index or opacity.
+3. The change looks right in light and dark mode, on mobile and desktop widths, and with reduced motion enabled. On the home page, check the name stays readable where it crosses the illustration (it uses `text-outline`, a page-coloured outline).
 4. If the running `next dev` keeps serving old server-rendered output after edits (hydration mismatch showing old markup), restart it. Don't delete `.next` while it runs.
 5. Commit messages are short and in the imperative ("Add projects filter"), one logical change per commit.
