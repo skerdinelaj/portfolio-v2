@@ -38,8 +38,9 @@ src/
   app/
     layout.tsx         Root: <html>, fonts, theme script, MotionProvider, SiteHeader (one header for every route)
     page.tsx           Home hub (renders HomeHub). One screen below the header, no Footer
-    (pages)/           Route group for /about /experience /tech /projects /reviews /contact
+    (pages)/           Route group for /about /experience /projects /reviews /contact
       layout.tsx       ScrollProgress + <main> + Footer for every inner page
+    (fullscreen)/      Route group for one-screen pages (/tech): layout is just <main>, no Footer
     globals.css        Tokens, dark mode, PhotoReveal + theme-switch + overscroll rules
   components/
     sections/          One component per page / big block (SiteHeader, PageMenu, HomeHub, OrbitNav, About, Projects, ...)
@@ -58,7 +59,7 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 ## Server vs. Client Components
 
 - Everything is a Server Component by default. Keep it that way.
-- Add `"use client"` only to the smallest leaf that needs state, effects, event handlers, browser APIs, or Motion. Existing client leaves: `Reveal`, `MotionProvider`, `RoleCycler`, `CountUp`, `ThemeToggle`, `LiveClock`, `PhotoReveal`, `Timeline`, `ScrollProgress`, `AutoHideHeader`, `PageMenu`, `OrbitNav`.
+- Add `"use client"` only to the smallest leaf that needs state, effects, event handlers, browser APIs, or Motion. Existing client leaves: `Reveal`, `MotionProvider`, `RoleCycler`, `CountUp`, `ThemeToggle`, `LiveClock`, `PhotoReveal`, `Timeline`, `ScrollProgress`, `AutoHideHeader`, `PageMenu`, `OrbitNav`, `TechGlobe`.
 - The header is `SiteHeader` in the root layout, so it stays mounted across navigations. Don't add another header to a page or to `(pages)/layout.tsx`. It is `h-14`, and `HomeHub` subtracts that height on desktop (`h-[calc(100dvh-3.5rem)]`) so home never scrolls: change both together.
 - Never mark a whole section `"use client"` just to animate it. Wrap the animated part in `<Reveal>` or a dedicated client leaf, and pass server-rendered content as `children`.
 - Props passed into Client Components must be serializable. Don't pass react-icons components (functions) or other non-serializable values across the boundary. Render the icon on the server side, or pass a string key and resolve it inside the client component (see how `HomeHub` strips `icon` before passing pages to `OrbitNav`).
@@ -88,6 +89,7 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
   - UI shapes: `background`, `surface`, `border`, `accent` (sage: buttons, timeline, orbit dots, progress bar, hover borders, focus rings), `accent-soft` (tag/pill fills), `positive`. `muted` is kept in the tokens but not used for text.
   - Decoration only, never text (too light for contrast): `peach`, `butter`, `rose`, `sage`, and `glow-1/2/3` (the light behind the avatar: sun pastels in light mode, moonlight blues in dark mode).
   - Never hardcode hex or Tailwind palette colours (`bg-emerald-500` and the like) in components.
+  - Exception that lives in **data**, not components: brand logo colours (`color` on each `Tech` in `src/data/tech.ts`, passed to react-icons' `color` prop). Black logos have no `color` so they follow the text colour in dark mode.
   - A new token goes in **three** places in `globals.css`: `:root`, `[data-theme="dark"]`, and the no-JS `prefers-color-scheme` fallback.
   - Any new text/background pair must pass **WCAG AA, 4.5:1** (3:1 for large text and UI shapes) in both themes. Measure it, don't eyeball it (see `LEARNING.md`, "Warm pastel palette").
 - Dark mode is driven by `data-theme` on `<html>`, set by the inline script in `layout.tsx` before first paint. `dark:` variants follow that attribute, not `prefers-color-scheme`. Don't remove that script or `suppressHydrationWarning`.
@@ -98,6 +100,7 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 
 - Use Motion (`motion/react`), never `framer-motion` imports.
 - Reuse `<Reveal>` for scroll-in effects before writing a new animation (it springs with a small overshoot; `x` slides sideways).
+- `/tech` is just the globe: it lives in the `(fullscreen)` route group (no Footer, no progress bar) and the globe is `min(100dvh − 5.5rem, 100vw − 2rem)` wide. If you change the header height, re-check that the page height equals the window height.
 - Home page on desktop never scrolls: `OrbitNav` takes the wheel/trackpad/swipe (one step per gesture) and cancels it so Safari doesn't rubber-band. Don't add content that needs page scroll there at `lg` and up.
 - Scroll-linked values (`useScroll` → `style`) are not covered by `MotionConfig reducedMotion`; check `useReducedMotion()` yourself (see `Timeline`).
 - Theme switching disables all transitions for one frame (`data-theme-switching` in `ThemeToggle` + `globals.css`). Keep that so light/dark flips instantly.

@@ -12,7 +12,13 @@ export type Job = {
   highlights: { title: string; text: string; tech?: string[] }[];
 };
 
-export type Tech = { name: string; icon: IconType; level: "Experienced" | "Intermediate" };
+export type Tech = {
+  name: string;
+  icon: IconType;
+  level: "Experienced" | "Intermediate";
+  /** Brand colour for the logo. Leave out for black logos so they follow the text colour in both themes. */
+  color?: string;
+};
 
 export type TechGroup = { category: string; items: Tech[] };
 
