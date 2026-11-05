@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { FiX } from "react-icons/fi";
+import { getTopScores, startRun, submitScore, type TopScore } from "@/lib/leaderboard";
 
 type Phase = "ready" | "playing" | "over";
 type Pillar = { x: number; gapY: number; passed: boolean };
@@ -57,6 +58,48 @@ export function SkyHopGame({ onClose }: { onClose: () => void }) {
   const flapRef = useRef<() => void>(() => {});
   const [phase, setPhase] = useState<Phase>("ready");
   const [result, setResult] = useState({ score: 0, best: 0 });
+  // Shared top 5 (null = leaderboard not available: no keys, offline…; the game works the same without it)
+  const [top, setTop] = useState<TopScore[] | null>(null);
+  const [saved, setSaved] = useState<string | null>(null); // the nickname just saved, to highlight it
+  const [saveError, setSaveError] = useState("");
+  const [saving, startSaving] = useTransition();
+  const runRef = useRef<string | null>(null); // this run's one-time ticket from the server
+
+  // A run starts: ask the server for a ticket (it notes the start time). A run ends: fetch the current top 5.
+  useEffect(() => {
+    if (phase === "playing") {
+      runRef.current = null;
+      startRun().then((id) => (runRef.current = id));
+    } else if (phase === "over") {
+      getTopScores().then((t) => {
+        setTop(t);
+        setSaved(null);
+        setSaveError("");
+      });
+    }
+  }, [phase]);
+
+  const qualifies =
+    phase === "over" &&
+    top !== null &&
+    saved === null &&
+    result.score > 0 &&
+    (top.length < 5 || result.score > top[top.length - 1].score);
+
+  const save = (form: FormData) => {
+    const name = String(form.get("nickname") ?? "");
+    const runId = runRef.current;
+    if (!runId) return setSaveError("The leaderboard is unavailable right now.");
+    startSaving(async () => {
+      const r = await submitScore(runId, name, result.score);
+      if (r.ok) {
+        runRef.current = null;
+        setTop(r.top);
+        setSaved(name.trim().replace(/\s+/g, " "));
+        setSaveError("");
+      } else setSaveError(r.error);
+    });
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -316,8 +359,9 @@ export function SkyHopGame({ onClose }: { onClose: () => void }) {
     let raf = 0;
     let last = performance.now();
     const loop = (now: number) => {
-      // Capped step: after a hidden tab (rAF pauses) the bird mustn't teleport through a pillar
-      const dt = Math.min((now - last) / 1000, 1 / 30);
+      // Capped step: after a hidden tab (rAF pauses) the bird mustn't teleport through a pillar. Floored at 0: the
+      // first frame's timestamp can be a hair before the performance.now() read above, which would run time backwards
+      const dt = Math.min(Math.max((now - last) / 1000, 0), 1 / 30);
       last = now;
       update(dt);
       draw();
@@ -364,12 +408,63 @@ export function SkyHopGame({ onClose }: { onClose: () => void }) {
 
       <div aria-live="polite" className="pointer-events-none absolute inset-0 flex items-center justify-center px-4">
         {phase === "over" && (
-          <div className="glass-lite rounded-2xl px-6 py-4 text-center text-foreground">
+          <div className="glass-lite max-h-full w-full max-w-xs overflow-y-auto rounded-2xl px-5 py-4 text-center text-foreground">
             <p className="text-2xl font-semibold">Bonk!</p>
             <p className="mt-1">
               Score {result.score} · Best {result.best}
             </p>
-            <p className="mt-2 text-sm">Tap or press Space to fly again</p>
+
+            {top !== null && top.length > 0 && (
+              <div className="mt-3 border-t border-foreground/10 pt-3 text-left text-sm">
+                <p className="text-center text-xs font-semibold tracking-widest uppercase">Top scores</p>
+                <ol className="mt-2 space-y-0.5">
+                  {top.map((t, i) => (
+                    <li
+                      key={`${i}-${t.name}`}
+                      className={`flex gap-2 rounded-md px-2 ${saved === t.name && t.score === result.score ? "bg-accent-soft font-semibold" : ""}`}
+                    >
+                      <span className="w-4 shrink-0">{i + 1}.</span>
+                      <span className="min-w-0 flex-1 truncate">{t.name}</span>
+                      <span className="tabular-nums">{t.score}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+
+            {qualifies && (
+              // pointer-events-auto + stopPropagation: the overlay passes taps through to the game (a tap = fly
+              // again), but typing a nickname mustn't restart it. Space in the field is ignored by the flap keys.
+              <form
+                action={save}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="pointer-events-auto mt-3 border-t border-foreground/10 pt-3 text-sm"
+              >
+                <label htmlFor="skyhop-nickname" className="block font-semibold">
+                  You made the top 5! Your nickname:
+                </label>
+                <div className="mt-2 flex gap-2">
+                  <input
+                    id="skyhop-nickname"
+                    name="nickname"
+                    required
+                    maxLength={16}
+                    autoComplete="nickname"
+                    className="min-w-0 flex-1 rounded-full border border-foreground/15 bg-surface px-3 py-1.5 outline-none focus-visible:border-accent"
+                  />
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="rounded-full bg-accent px-4 py-1.5 font-semibold text-white disabled:opacity-70 dark:text-background"
+                  >
+                    {saving ? "Saving…" : "Save"}
+                  </button>
+                </div>
+                {saveError && <p className="mt-2 text-xs">{saveError}</p>}
+              </form>
+            )}
+
+            <p className="mt-3 text-sm">Tap or press Space to fly again</p>
           </div>
         )}
       </div>

@@ -49,6 +49,7 @@ src/
     ui/                Reusable building blocks (Section, Reveal, PhotoReveal, GlassWindow, PopupWindow, OrbitEdge, ScrollProgress, ...)
   data/                Static content + types.ts (the content model). pages.ts lists the six pages
   lib/contact.ts       "use server": sendMessage Server Action (validates, then emails via Resend)
+  lib/leaderboard.ts   "use server": Sky Hop top 5 in Upstash Redis (startRun ticket, getTopScores, submitScore)
 LEARNING.md            Learning journal: one entry per meaningful change (see Teaching mode)
 public/                avatar.webp (cut-out photo), avatar-illustration.webp (aligned illustration), projects/, logos/, ...
 ```
@@ -90,6 +91,13 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 - Mail goes through Resend's REST API with plain `fetch` (no SDK). The key is `RESEND_API_KEY` in `.env.local` (git-ignored) and in the Vercel project's env vars. Never prefix it with `NEXT_PUBLIC_`. `.env.example` documents it.
 - Sender is `onboarding@resend.dev`, which only delivers to the Resend account's own address (`profile.email`). Sending from your own domain needs a verified domain in Resend.
 - Without the key the form shows a friendly "email me directly" message and logs on the server.
+
+## Sky Hop leaderboard (Server Actions + Upstash Redis)
+
+- Top 5 scores with nicknames in an Upstash Redis sorted set (`skyhop:top`, member `<runId>:<name>`), reached through Upstash's REST `/pipeline` endpoint with plain `fetch` (no SDK). Keys `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` in `.env.local` and the host's env vars; without them the actions return null and the game shows no leaderboard.
+- Anti-cheat, because Server Actions are public endpoints: `startRun()` (called when a run starts) stores a one-time ticket with the start time; `submitScore` consumes it with `GETDEL` and rejects a score that couldn't fit in the elapsed time (`MIN_SECONDS_PER_POINT` = 1.6, from the game's pillar spacing ÷ speed; change it together with the game's physics). Nickname: 16 chars of letters/numbers/space/`_.-` plus a small blocklist. Rate limit per IP with `INCR` + `EXPIRE NX`.
+- The nickname form sits in the game-over overlay, which lets taps through to the game: it needs `pointer-events-auto` and `onPointerDown` stopPropagation, or typing restarts the game.
+- To test, call the actions over HTTP with a `Next-Action` header (IDs in `.next/server/server-reference-manifest.json`), then delete the test keys (`skyhop:*`) from Redis.
 
 ## Data fetching and caching (when it is added)
 
