@@ -1,32 +1,89 @@
 import type { Project } from "./types";
 
-// Featured = work case studies. Add screenshots to /public/projects (blur anything confidential).
+// Work = projects I built at the companies in experience.ts; learning = my own learning projects.
+// Order here is the order on the page. Add screenshots to /public/projects (blur anything confidential).
 export const projects: Project[] = [
   {
-    slug: "ai-defense-builder",
-    title: "AI Defense Builder",
+    slug: "aero-claim-pro",
+    title: "Aero Claim Pro",
     company: "Oracle Law Global",
     summary:
-      "Generates legal defense drafts for flight-related cases. In testing, it cut drafting time per case from ~2 hours to 15–20 minutes.",
+      "A platform made of several tabs. One of them, Aero Defender AI, automatically generates legal defense drafts for flight-related cases. In testing, it cut estimated drafting time per case from ~2 hours to 15–20 minutes.",
     tech: ["React", "TypeScript", "Python", "Claude API"],
-    featured: true,
+    // Private details (a colleague's name and email, the firm's claim figures) are blurred in the screenshot
+    image: "/projects/aero-claim-pro.webp",
+    live: "https://aeroclaimpro.com/signin",
+    kind: "work",
+  },
+  {
+    slug: "oracle-law-global-website",
+    title: "Oracle Law Global website",
+    company: "Oracle Law Global",
+    summary:
+      "Led the rebrand from Oracle Solicitors to Oracle Law Global and rebuilt the firm's website. I manage its hosting, SSL/DNS, SEO and GDPR compliance.",
+    tech: ["WordPress", "Elementor"],
+    image: "/projects/oracle-law-global.webp",
+    live: "https://oraclelawglobal.com",
+    kind: "work",
   },
   {
     slug: "okko",
     title: "Okko",
     company: "Okko (Freelance)",
     summary:
-      "A social and jobs mobile app (chat, project ideas, job posts) with a Node.js microservices backend, built end-to-end.",
-    tech: ["React Native", "Expo", "Node.js", "MongoDB", "PostgreSQL", "AWS"],
-    featured: true,
+      "A mobile app where people chat, share project ideas, post and browse open jobs, and connect with each other. I built it end-to-end: the app, and the backend behind it.",
+    tech: ["React Native", "Expo", "Node.js", "Express", "MongoDB", "PostgreSQL", "AWS"],
+    image: "/projects/okko.webp",
+    live: "https://okko.hinnovostage.com",
+    kind: "work",
+  },
+  {
+    slug: "circular-fashion",
+    title: "Circular Fashion",
+    company: "Division 5",
+    summary:
+      "A company helping fashion brands design and certify circular products. I built new features and gave ongoing support on its platform where users sell, swap or donate used clothing.",
+    tech: ["React", "Redux", "JavaScript", "SCSS"],
+    image: "/projects/circular-fashion.webp",
+    live: "https://circular.fashion",
+    kind: "work",
   },
   {
     slug: "osgenic",
     title: "Osgenic",
     company: "Division 5",
-    summary: "A 3D web game that challenges doctors to identify anatomical parts.",
+    summary: "An educational platform for orthopaedics and traumatology. I built its 3D web game that challenges doctors to identify anatomical parts.",
     tech: ["React", "TypeScript", "Babylon.js"],
-    featured: true,
+    image: "/projects/osgenic.webp",
+    live: "https://osgenic.com",
+    kind: "work",
+  },
+  {
+    slug: "binschonda",
+    title: "Binschonda",
+    company: "Engage Technology",
+    summary:
+      "A web app providing everyday task support for elderly users. I shipped new features and bug fixes.",
+    tech: ["React", "JavaScript", "React Router", "Axios", "Tailwind"],
+    image: "/projects/binschonda.webp",
+    live: "https://www.binschonda.de/en/home/",
+    kind: "work",
+  },
+  {
+    slug: "lss",
+    title: "LSS",
+    company: "Linfa SH.P.K",
+    summary: "A recruiting platform matching open roles to company needs.",
+    tech: ["React", "Redux", "TypeScript", "SCSS", "Material UI"],
+    kind: "work",
+  },
+  {
+    slug: "cqs",
+    title: "CQS",
+    company: "Linfa SH.P.K",
+    summary: "An application allowing bank employees to take out payroll-deducted loans.",
+    tech: ["C#", "Bootstrap"],
+    kind: "work",
   },
   {
     slug: "react-mentoring",
@@ -36,7 +93,7 @@ export const projects: Project[] = [
     image: "/projects/kickstart-react.jpg",
     github: "https://github.com/skerdinelaj/react-mentoring-finish-project",
     live: "https://skerdinelaj.github.io/react-mentoring-finish-project/",
-    featured: false,
+    kind: "learning",
   },
   {
     slug: "online-shop",
@@ -46,7 +103,7 @@ export const projects: Project[] = [
     image: "/projects/mocha-overcoat.jpg",
     github: "https://github.com/skerdinelaj/online-shop/",
     live: "https://skerdinelaj.github.io/online-shop/",
-    featured: false,
+    kind: "learning",
   },
   {
     slug: "music-playlist",
@@ -56,6 +113,6 @@ export const projects: Project[] = [
     image: "/projects/music-playlist.png",
     github: "https://github.com/skerdinelaj/music-palylist",
     live: "https://skerdinelaj.github.io/music-palylist/",
-    featured: false,
+    kind: "learning",
   },
 ];

@@ -1,5 +1,4 @@
 import { Constellation } from "@/components/sections/Constellation";
-import { Reveal } from "@/components/ui/Reveal";
 import { experience } from "@/data/experience";
 
 const year = (date: string) => date.split(" ").at(-1) ?? date;
@@ -16,11 +15,6 @@ export function Experience() {
 
   return (
     <section className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-4 sm:px-6 [@media(min-height:880px)]:py-6">
-      <Reveal className="text-center">
-        <p className="text-sm font-medium tracking-widest uppercase">Where I&apos;ve worked</p>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">Experience</h1>
-      </Reveal>
-
       <Constellation
         stars={jobs.map((job) => {
           const from = year(job.start);

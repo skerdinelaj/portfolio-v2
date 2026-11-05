@@ -35,7 +35,8 @@ export function PageBar({ pages }: { pages: { href: string; label: string }[] })
 
   return (
     <div className="flex h-10 shrink-0 items-center justify-between gap-4 border-b border-border px-4 text-sm sm:px-6">
-      <p className="truncate font-medium">{label}</p>
+      {/* The page's one <h1>: pages don't show a big title of their own */}
+      <h1 className="truncate font-medium">{label}</h1>
       <Link
         href="/"
         aria-label="Back to home (Esc)"

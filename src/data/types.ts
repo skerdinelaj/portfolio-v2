@@ -36,28 +36,40 @@ export type Project = {
   image?: string;
   github?: string;
   live?: string;
-  featured: boolean;
+  /** "work": built at a company (shows the company); "learning": my own learning projects. The Projects page tabs. */
+  kind: "work" | "learning";
 };
 
+/** A colleague's review. With no `quote` yet it shows as "review on its way": never write one for them. */
 export type Testimonial = {
-  quote: string;
   name: string;
-  role: string;
-  company: string;
+  /** Companies we worked at together, as named in experience.ts */
+  companies: string[];
+  /** Their own words, added only once they've sent them */
+  quote?: string;
+  role?: string;
   photo?: string;
   linkedin?: string;
-  /** true until you replace it with a real review */
-  placeholder?: boolean;
 };
 
+/** One titled part of a letter (the opening part has no heading). */
+export type LetterSection = { heading?: string; paragraphs: string[] };
+
+/** A signed reference letter, quoted in full on /reviews (contact details, addresses and signatures left out). */
 export type ReferenceLetter = {
+  slug: string;
   author: string;
   role: string;
   company: string;
+  /** What the author's relationship to me was, one line */
+  relation: string;
+  /** As written on the letter, e.g. "30.09.2026" */
+  date: string;
+  /** The line shown on the card */
   excerpt: string;
-  /** Path under /public, e.g. "/letters/oracle-reference.pdf" */
+  body: LetterSection[];
+  /** Path under /public, e.g. "/letters/oracle-reference.pdf" (only a copy with private details removed) */
   pdf?: string;
-  placeholder?: boolean;
 };
 
 /** A top-level page, shown as a card on the home page and as a Navbar link. */

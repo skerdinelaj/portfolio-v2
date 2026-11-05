@@ -60,16 +60,16 @@ export const experience: Job[] = [
     end: "June 2024",
     summary: [
       "I joined Division 5 in January 2023 as a Front-End Developer and stayed for a year and a half, until June 2024, working on two very different products.",
-      "Circular Fashion is a platform where people sell, swap or donate clothes they no longer wear: there I built new features and gave the product ongoing support. Osgenic was something else entirely, a web game that challenges doctors to identify anatomical parts, which I built.",
+      "Circular Fashion helps fashion brands design and certify circular products: I built new features and gave ongoing support on its platform where people sell, swap or donate clothes they no longer wear. Osgenic was something else entirely, an educational platform for orthopaedics and traumatology, where I built a 3D web game that challenges doctors to identify anatomical parts.",
     ],
     highlights: [
       {
         title: "Circular Fashion",
-        text: "Implemented new features and ongoing support for a platform where users sell, swap, or donate used clothing.",
+        text: "A company helping fashion brands design and certify circular products. I built new features and gave ongoing support on its platform where users sell, swap or donate used clothing.",
       },
       {
         title: "Osgenic",
-        text: "Built a gaming web app challenging doctors to identify anatomical parts.",
+        text: "An educational platform for orthopaedics and traumatology. I built its 3D web game that challenges doctors to identify anatomical parts.",
       },
     ],
   },

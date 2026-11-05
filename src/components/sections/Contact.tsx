@@ -18,7 +18,7 @@ export function Contact() {
       <div className="flex w-full max-w-[26rem] flex-col gap-5 sm:max-w-[50rem] sm:flex-row sm:items-start sm:justify-center sm:gap-5">
         <div className="w-full sm:max-w-[30rem]">
           <div className={`motion-safe:animate-float ${floating}`}>
-            <GlassWindow title="Let's talk." heading="h1" orbitDuration={18}>
+            <GlassWindow title="Let's talk." orbitDuration={18}>
               <ContactForm to={profile.email} />
             </GlassWindow>
           </div>

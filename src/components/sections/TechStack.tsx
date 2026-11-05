@@ -8,8 +8,6 @@ const techs = techGroups.flatMap((g) => g.items.map((t) => ({ ...t, category: g.
 export function TechStack() {
   return (
     <section className="flex flex-1 items-center justify-center">
-      {/* Not shown, but every page needs its one <h1> for screen readers and search engines */}
-      <h1 className="sr-only">Tech stack</h1>
       <Reveal>
         {/* Icons are rendered here on the server and passed in as children: react-icons are functions,
             which can't cross into a Client Component as props. Only plain data goes in `items`. */}

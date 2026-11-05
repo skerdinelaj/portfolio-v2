@@ -1,12 +1,10 @@
 "use client";
 
-import { motion, type Variants } from "motion/react";
-import { useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import { GlassWindow } from "@/components/ui/GlassWindow";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { PopupWindow } from "@/components/ui/PopupWindow";
 import { Reveal } from "@/components/ui/Reveal";
 
 type Star = { company: string; short: string; years: string };
-type Phase = "out" | "in";
 
 // Star heights (% from the top of the sky), cycled: a zig-zag reads as a constellation rather than a chart
 const HEIGHTS = [66, 28, 60, 24, 48];
@@ -23,52 +21,20 @@ const DUST = Array.from({ length: 60 }, () => ({
   delay: `${round(rand() * 3.2)}s`,
 }));
 
-const backdrop: Variants = {
-  out: { opacity: 0, transition: { duration: 0.2 } },
-  in: { opacity: 1, transition: { duration: 0.25 } },
-};
-// The window grows out of the clicked star and shrinks back into it: `transformOrigin` is set to the star's dot (see
-// `aim`), so animating `scale` alone does the travelling. Closing eases in, so it speeds up as it's "sucked in".
-// The window fades via `--window-opacity` (GlassWindow applies it to the glass itself), never `opacity` on this
-// wrapper: a fading ancestor switches the blur off for the whole animation.
-const card: Variants = {
-  out: {
-    "--window-opacity": 0,
-    scale: 0,
-    transition: { duration: 0.32, ease: [0.55, 0, 0.9, 0.4] },
-  },
-  in: {
-    "--window-opacity": 1,
-    scale: 1,
-    transition: {
-      scale: { type: "spring", stiffness: 260, damping: 24 },
-      "--window-opacity": { duration: 0.18 },
-    },
-  },
-};
-
 /**
  * The Experience sky: one star per job, oldest → newest, joined by a dashed path; a sage line fills the path up to
- * the last job you opened (today's job at first: "the road so far"). Clicking a star opens that job in a popup.
- * The popup is a native <dialog> opened with `showModal()`: the browser puts it in the top layer (above the header),
- * makes the rest of the page inert (no clicks, no Tab) and turns Esc into a `cancel` event. We only add the animation:
- * close = animate out, then `dialog.close()`.
+ * the star under the pointer, or the last job you opened (today's job at first: "the road so far"). Clicking a star
+ * opens that job in a `PopupWindow` that grows out of the star's dot and shrinks back into it.
  * `panels` are rendered on the server (one per star, same order); all stay in the HTML, the popup shows one.
  */
 export function Constellation({ stars, panels }: { stars: Star[]; panels: ReactNode[] }) {
   const [selected, setSelected] = useState(stars.length - 1); // where the line stays: today's job, then the last one opened
   const [preview, setPreview] = useState<number | null>(null); // the star under the pointer / keyboard focus
-  const [origin, setOrigin] = useState("50% 50%"); // the dot the window grows from, in the window's own pixels
   const [open, setOpen] = useState(false);
-  const [phase, setPhase] = useState<Phase>("out");
   const [size, setSize] = useState({ w: 0, h: 0 });
   const skyRef = useRef<HTMLDivElement>(null);
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const boxRef = useRef<HTMLDivElement>(null); // the window's untransformed box
   const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const openedRef = useRef(0); // the star the popup belongs to (written by the click handler only)
-  const closing = useRef(false);
-  const titleId = useId();
 
   // The path is drawn in pixels (so dashes keep their length at any width), which needs the sky's measured size.
   // Before that (server HTML, first paint) there is simply no line yet.
@@ -80,50 +46,10 @@ export function Constellation({ stars, panels }: { stars: Star[]; panels: ReactN
     return () => ro.disconnect();
   }, []);
 
-  // Point the window's transform-origin at the opened star's dot. Measured on the window's wrapper, which is never
-  // transformed, so its box is where the window sits at full size.
-  const aim = () => {
-    const box = boxRef.current?.getBoundingClientRect();
-    const dot = dotRefs.current[openedRef.current]?.getBoundingClientRect();
-    if (box && dot)
-      setOrigin(`${round(dot.left + dot.width / 2 - box.left)}px ${round(dot.top + dot.height / 2 - box.top)}px`);
-  };
-
-  // Open: show the dialog, lock the page scroll (phones), animate in on the next frame.
-  // Cleanup runs on close AND when the page is hidden by <Activity> (navigating away): either way, close the dialog,
-  // unlock, put focus back on the star that opened it, and reset so the next opening starts fresh.
-  useLayoutEffect(() => {
-    const dialog = dialogRef.current;
-    if (!open || !dialog) return;
-    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const html = document.documentElement;
-    const overflow = html.style.overflow;
-    dialog.showModal();
-    html.style.overflow = "hidden";
-    // The dialog is laid out now, so the window's box can be measured: aim at the star, then grow on the next frame
-    aim();
-    const frame = requestAnimationFrame(() => setPhase("in"));
-    return () => {
-      cancelAnimationFrame(frame);
-      if (dialog.open) dialog.close();
-      html.style.overflow = overflow;
-      opener?.focus({ preventScroll: true });
-      closing.current = false;
-      setPhase("out");
-      setOpen(false);
-    };
-  }, [open]);
-
   const openJob = (i: number) => {
     openedRef.current = i;
     setSelected(i);
     setOpen(true);
-  };
-  const requestClose = () => {
-    if (closing.current) return;
-    closing.current = true;
-    aim(); // the star may have moved since opening (window resized)
-    setPhase("out"); // the card's onAnimationComplete finishes the job
   };
   const lineTo = preview ?? selected;
 
@@ -236,60 +162,21 @@ export function Constellation({ stars, panels }: { stars: Star[]; panels: ReactN
         </div>
       </Reveal>
 
-      {/* The job popup. Full-screen and transparent itself: our own backdrop and card animate inside it
-          (the native ::backdrop can't be animated out). Closed = `display: none`, but the panels are in the HTML. */}
-      <dialog
-        ref={dialogRef}
-        aria-labelledby={titleId}
-        onCancel={(e) => {
-          e.preventDefault(); // Esc: animate out first
-          requestClose();
-        }}
-        onClose={() => setOpen(false)} // closed some other way (e.g. a second Esc the browser won't let us cancel)
-        className="fixed inset-0 m-0 size-full max-h-none max-w-none overflow-y-auto border-0 bg-transparent p-3 text-foreground outline-none backdrop:bg-transparent sm:p-6"
+      <PopupWindow
+        open={open}
+        title={stars[selected].company}
+        origin={() => dotRefs.current[openedRef.current]}
+        onClosed={() => setOpen(false)}
       >
-        <motion.div
-          aria-hidden
-          variants={backdrop}
-          initial="out"
-          animate={phase}
-          onClick={requestClose}
-          className="fixed inset-0 bg-background/60 backdrop-blur-[3px]"
-        >
-          {/* Sun (light) / moon (dark) glow behind the window, as in the contact popup */}
-          <div className="absolute top-1/2 left-1/2 size-[min(44rem,95vw)] -translate-1/2 rounded-full bg-linear-to-br from-glow-1 via-glow-2 to-glow-3 opacity-80 blur-3xl" />
-        </motion.div>
-        {/* pointer-events-none: clicks beside the card fall through to the backdrop, which closes */}
-        <div className="pointer-events-none relative flex min-h-full items-center justify-center">
-          <div ref={boxRef} className="pointer-events-auto w-full max-w-2xl">
-            <motion.div
-              variants={card}
-              initial="out"
-              animate={phase}
-              style={{ transformOrigin: origin }}
-              onAnimationComplete={(name) => {
-                if (name === "out" && closing.current) setOpen(false);
-              }}
-            >
-              <GlassWindow
-                title={stars[selected].company}
-                titleId={titleId}
-                onClose={requestClose}
-                closeLabel="Close"
-                orbitDuration={22}
-              >
-                <div className="p-5 sm:p-7">
-                  {panels.map((panel, i) => (
-                    <div key={i} hidden={i !== selected}>
-                      {panel}
-                    </div>
-                  ))}
-                </div>
-              </GlassWindow>
-            </motion.div>
-          </div>
+        {/* Every job's content is here (in the HTML); only the opened one shows */}
+        <div className="p-5 sm:p-7">
+          {panels.map((panel, i) => (
+            <div key={i} hidden={i !== selected}>
+              {panel}
+            </div>
+          ))}
         </div>
-      </dialog>
+      </PopupWindow>
     </>
   );
 }

@@ -30,7 +30,7 @@ export function About() {
         </Reveal>
 
         {/* Bio. The glass window itself doesn't fade in (a fading ancestor switches its blur off); its text does. */}
-        <GlassWindow title="About me" heading="h1" orbitDuration={20}>
+        <GlassWindow orbitDuration={20}>
           {/* Text size follows the screen height too: the larger size only where there's room.
               Desktop: the page stays one screen, so when the text is taller than the space, this box scrolls on its
               own (focusable, so keyboard users can scroll it too: Safari doesn't make scroll boxes focusable). The bottom 3rem
@@ -39,7 +39,7 @@ export function About() {
             tabIndex={0}
             role="region"
             aria-label="About me text"
-            className="space-y-3 p-5 text-base leading-relaxed outline-none focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-accent sm:p-6 lg:max-h-[calc(100dvh-19.5rem)] lg:overflow-y-auto lg:overscroll-contain lg:pb-12 lg:[scrollbar-width:thin] lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-3rem),transparent)] [@media(min-height:880px)]:space-y-4 [@media(min-height:880px)]:p-8 [@media(min-height:880px)]:text-lg"
+            className="space-y-3 p-5 text-base leading-relaxed outline-none focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-accent sm:p-6 lg:max-h-[calc(100dvh-16rem)] lg:overflow-y-auto lg:overscroll-contain lg:pb-12 lg:[scrollbar-width:thin] lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-3rem),transparent)] [@media(min-height:880px)]:space-y-4 [@media(min-height:880px)]:p-8 [@media(min-height:880px)]:text-lg"
           >
             {profile.about.map((p, i) => (
               <Reveal key={i} delay={0.1 + i * 0.1}>
