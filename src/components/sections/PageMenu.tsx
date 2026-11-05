@@ -166,14 +166,24 @@ export function PageMenu({ pages, avatar, initials }: { pages: MenuPage[]; avata
                 transition={SPRING}
                 className="absolute top-1/2 left-1/2 -mt-12 -ml-12 size-24"
               >
+                {/* draggable={false} on both: a native drag would show a "ghost" of the whole full-body image file
+                    (the browser ignores the CSS crop and zoom), so dragging the avatar is turned off */}
                 <Link
                   href="/"
                   aria-label="Home"
                   aria-current={pathname === "/" ? "page" : undefined}
                   onClick={() => setOpen(false)}
-                  className="relative block size-full overflow-hidden rounded-full border-4 border-surface bg-accent-soft shadow-md transition hover:scale-105 hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  draggable={false}
+                  className="relative block size-full overflow-hidden rounded-full border-4 border-surface bg-accent-soft shadow-md transition select-none hover:scale-105 hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                 >
-                  <Image src={avatar} alt="" fill sizes="300px" className="origin-[50%_-12%] scale-[2.5] object-cover" />
+                  <Image
+                    src={avatar}
+                    alt=""
+                    fill
+                    sizes="300px"
+                    draggable={false}
+                    className="origin-[50%_-12%] scale-[2.5] object-cover"
+                  />
                 </Link>
               </motion.div>
 
