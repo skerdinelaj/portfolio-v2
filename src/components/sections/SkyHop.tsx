@@ -29,8 +29,21 @@ export function SkyHop() {
       setOpenOn(null);
       buttonRef.current?.focus();
     };
+    // A press anywhere outside the header (the page below the game) closes it too. Presses inside the header don't:
+    // the bird button toggles itself, and the menu / theme toggle should work without ending the run.
+    // Capture phase, so it still fires when something on the page stops the event's propagation.
+    const onPress = (e: PointerEvent) => {
+      const header = buttonRef.current?.closest("header");
+      if (e.target instanceof Node && header?.contains(e.target)) return;
+      if (document.querySelector("dialog[open]")) return;
+      setOpenOn(null); // no focus move: you clicked somewhere else on purpose
+    };
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPress, true);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPress, true);
+    };
   }, [open]);
 
   const close = () => {
@@ -49,44 +62,73 @@ export function SkyHop() {
         className="group flex items-center gap-1.5 rounded-full p-1 text-foreground focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
       >
         <span className="motion-safe:animate-hop inline-block">
+          {/* Two drawings of the bird: side view (flying) and front view (smiling at you). Hover or keyboard focus
+              swaps them with a quick squeeze, so it looks like the bird turns round. Both scale about the viewBox
+              centre (SVG's default transform-box), which is the middle of the bird. */}
           <svg viewBox="0 0 40 36" className="h-7 w-8 transition-transform group-hover:-translate-y-0.5" aria-hidden>
-            <g className="stroke-foreground" strokeWidth="1.6" strokeLinejoin="round">
-              <ellipse cx="17" cy="5.5" rx="2" ry="3.5" transform="rotate(-25 17 5.5)" className="fill-rose" />
-              <circle cx="18" cy="19" r="11" className="fill-butter" />
-              <ellipse cx="20" cy="23.5" rx="6" ry="4" className="fill-peach" strokeWidth="0" />
-              <g className="motion-safe:animate-wing origin-[14px_19px]">
-                <ellipse cx="14" cy="19.5" rx="5.5" ry="3.2" className="fill-rose" />
+            <g className="transition duration-200 group-hover:scale-x-0 group-hover:opacity-0 group-focus-visible:scale-x-0 group-focus-visible:opacity-0">
+              <g className="stroke-foreground" strokeWidth="1.6" strokeLinejoin="round">
+                <ellipse cx="17" cy="5.5" rx="2" ry="3.5" transform="rotate(-25 17 5.5)" className="fill-rose" />
+                <circle cx="18" cy="19" r="11" className="fill-butter" />
+                <ellipse cx="20" cy="23.5" rx="6" ry="4" className="fill-peach" strokeWidth="0" />
+                <g className="motion-safe:animate-wing origin-[14px_19px]">
+                  <ellipse cx="14" cy="19.5" rx="5.5" ry="3.2" className="fill-rose" />
+                </g>
+                <path d="M28 16.5 L35 19 L28 21.5 Z" className="fill-peach" />
+                <circle cx="23" cy="15.5" r="2.8" className="fill-surface" />
               </g>
-              <path d="M28 16.5 L35 19 L28 21.5 Z" className="fill-peach" />
-              <circle cx="23" cy="15.5" r="2.8" className="fill-surface" />
+              <circle cx="23.8" cy="15.5" r="1.2" className="fill-foreground" />
             </g>
-            <circle cx="23.8" cy="15.5" r="1.2" className="fill-foreground" />
+            <g className="scale-x-0 opacity-0 transition duration-200 group-hover:scale-x-100 group-hover:opacity-100 group-hover:delay-75 group-focus-visible:scale-x-100 group-focus-visible:opacity-100">
+              <g className="stroke-foreground" strokeWidth="1.6" strokeLinejoin="round">
+                <ellipse cx="20" cy="5" rx="2" ry="3.5" className="fill-rose" />
+                <ellipse cx="8.5" cy="21" rx="2.5" ry="4.5" transform="rotate(25 8.5 21)" className="fill-rose" />
+                <ellipse cx="31.5" cy="21" rx="2.5" ry="4.5" transform="rotate(-25 31.5 21)" className="fill-rose" />
+                <circle cx="20" cy="19" r="11" className="fill-butter" />
+                <ellipse cx="20" cy="24.5" rx="6" ry="3.5" className="fill-peach" strokeWidth="0" />
+                <circle cx="15.5" cy="15.5" r="2.6" className="fill-surface" />
+                <circle cx="24.5" cy="15.5" r="2.6" className="fill-surface" />
+                <path d="M18 18 L22 18 L20 20.5 Z" className="fill-peach" strokeWidth="1.2" />
+                <path d="M16 22.5 Q20 26.5 24 22.5" fill="none" strokeLinecap="round" />
+              </g>
+              <circle cx="15.5" cy="15.8" r="1.2" className="fill-foreground" />
+              <circle cx="24.5" cy="15.8" r="1.2" className="fill-foreground" />
+              <circle cx="12" cy="20" r="1.6" className="fill-rose" />
+              <circle cx="28" cy="20" r="1.6" className="fill-rose" />
+            </g>
           </svg>
         </span>
         {/* The speech bubble is also the button's accessible name */}
-        <span className="glass-lite rounded-full px-2.5 py-0.5 text-xs whitespace-nowrap group-hover:border-accent">
+        <span className="text-xs whitespace-nowrap decoration-accent underline-offset-4 group-hover:underline">
           {open ? "Back to work!" : "Bored? Click me!"}
         </span>
       </button>
 
       <AnimatePresence>
         {open && (
-          <motion.div
+          // The outer box is fixed under the header and clips; the inner sheet slides down out of the navbar's bottom
+          // edge and back up into it on close. Only `transform` animates (GPU-composited, no layout or repaint per
+          // frame), and an ease-out tween instead of a spring: no overshoot that would show a gap under the header.
+          <div
             id={panelId}
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ type: "spring", stiffness: 320, damping: 30 }}
             // React's stopPropagation also stops the native event at the root, so the home ring's window listeners
             // don't turn the ring while you play
             onWheel={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
             onTouchEnd={(e) => e.stopPropagation()}
-            // Solid background, no blur: the header already has a backdrop-filter, and a nested one can't see the page
-            className="absolute inset-x-0 top-full h-[max(16rem,calc(50dvh-3.5rem))] overflow-hidden border-b border-border bg-background shadow-[0_24px_40px_-24px_rgb(0_0_0/0.35)]"
+            // pb-10 leaves room for the sheet's shadow inside the clip; pointer-events-none lets presses there reach the page
+            className="pointer-events-none absolute inset-x-0 top-full overflow-hidden pb-10"
           >
-            <SkyHopGame onClose={close} />
-          </motion.div>
+            <motion.div
+              initial={{ y: "-100%" }}
+              animate={{ y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } }}
+              exit={{ y: "-100%", transition: { duration: 0.3, ease: [0.55, 0, 0.75, 0.06] } }}
+              // Solid background, no blur: the header already has a backdrop-filter, and a nested one can't see the page
+              className="pointer-events-auto h-[max(16rem,calc(50dvh-3.5rem))] border-b border-border bg-background shadow-[0_24px_40px_-24px_rgb(0_0_0/0.35)] will-change-transform"
+            >
+              <SkyHopGame onClose={close} />
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
