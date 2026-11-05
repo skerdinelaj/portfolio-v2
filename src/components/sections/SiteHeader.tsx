@@ -1,4 +1,5 @@
 import { PageMenu } from "@/components/sections/PageMenu";
+import { SkyHop } from "@/components/sections/SkyHop";
 import { AutoHideHeader } from "@/components/ui/AutoHideHeader";
 import { LiveClock } from "@/components/ui/LiveClock";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -16,6 +17,9 @@ export function SiteHeader() {
     <AutoHideHeader className="sticky top-0 z-50 flex h-14 shrink-0 items-stretch border-b border-border bg-background/85 text-sm backdrop-blur">
       {/* The initials open the menu; home is the avatar in its centre. Icons are functions, which can't cross into a Client Component, so only the plain fields are passed */}
       <PageMenu pages={sitePages.map(({ href, label, teaser }) => ({ href, label, teaser }))} avatar={profile.illustration} initials={initials} />
+
+      {/* Easter egg: a bouncing bird that opens a mini game in a panel below the header */}
+      <SkyHop />
 
       <div className="ml-auto flex items-stretch">
         {profile.status && (

@@ -96,6 +96,17 @@
     0%, 100% { transform: translateY(0) rotate(-0.4deg); }
     50% { transform: translateY(-10px) rotate(0.4deg); }
   }
+  /* The bored bird in the header (SkyHop): a little hop, and a lazy wing flap on its own beat */
+  --animate-hop: hop 1.6s ease-in-out infinite;
+  @keyframes hop {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-4px); }
+  }
+  --animate-wing: wing 0.8s ease-in-out infinite;
+  @keyframes wing {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-28deg); }
+  }
   /* Background stars on the Experience sky; each gets its own delay */
   --animate-twinkle: twinkle 3.2s ease-in-out infinite;
   @keyframes twinkle {
