@@ -67,6 +67,8 @@ export type ReferenceLetter = {
   date: string;
   /** The line shown on the card */
   excerpt: string;
+  /** Short lines that orbit the avatar on /reviews. Each must be copied word for word from `body`. */
+  highlights: string[];
   body: LetterSection[];
   /** Path under /public, e.g. "/letters/oracle-reference.pdf" (only a copy with private details removed) */
   pdf?: string;
