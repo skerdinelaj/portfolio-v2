@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, type Variants } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import { ContactWindow } from "@/components/sections/ContactWindow";
+import { GlassWindow } from "@/components/ui/GlassWindow";
 
 type Phase = "out" | "in";
 
@@ -11,15 +11,18 @@ const SPRING = { type: "spring", stiffness: 300, damping: 24 } as const;
 // Pause the float while the pointer is over a window or focus is inside it
 const floating = "hover:[animation-play-state:paused] focus-within:[animation-play-state:paused]";
 const backdrop: Variants = { out: { opacity: 0, transition: { duration: 0.25 } }, in: { opacity: 1, transition: { duration: 0.25 } } };
-// Big card: springs up from below with a slight tilt; leaves the same way
+// Big card: springs up from below with a slight tilt; leaves the same way.
+// The fade animates `--window-opacity`, not `opacity`: GlassWindow applies the variable to the glass itself. Fading this
+// wrapper instead would switch the glass blur off for the whole animation (the illustration behind showed through
+// sharply, then the blur popped on: a "flash").
 const big: Variants = {
-  out: { opacity: 0, y: 60, scale: 0.92, rotate: -3, transition: { duration: 0.25, ease: "easeIn" } },
-  in: { opacity: 1, y: 0, scale: 1, rotate: 0, transition: SPRING },
+  out: { "--window-opacity": 0, y: 60, scale: 0.92, rotate: -3, transition: { duration: 0.25, ease: "easeIn" } },
+  in: { "--window-opacity": 1, y: 0, scale: 1, rotate: 0, transition: SPRING },
 };
 // Small card: swings in from the side a beat later; leaves first
 const small: Variants = {
-  out: { opacity: 0, x: 40, y: 20, scale: 0.85, rotate: 8, transition: { duration: 0.2, ease: "easeIn" } },
-  in: { opacity: 1, x: 0, y: 0, scale: 1, rotate: 0, transition: { ...SPRING, delay: 0.12 } },
+  out: { "--window-opacity": 0, x: 40, y: 20, scale: 0.85, rotate: 8, transition: { duration: 0.2, ease: "easeIn" } },
+  in: { "--window-opacity": 1, x: 0, y: 0, scale: 1, rotate: 0, transition: { ...SPRING, delay: 0.12 } },
 };
 
 /**
@@ -102,19 +105,19 @@ export function ContactModal({ children, links }: { children: ReactNode; links: 
               if (name === "out" && closing.current) router.back();
             }}
           >
-            <ContactWindow title="Let's talk." titleId="contact-title" onClose={close} closeLabel="Close" orbitDuration={18}>
+            <GlassWindow title="Let's talk." titleId="contact-title" onClose={close} closeLabel="Close" orbitDuration={18}>
               {children}
-            </ContactWindow>
+            </GlassWindow>
           </motion.div>
         </motion.div>
 
         <AnimatePresence>
           {showLinks && (
-            <motion.div key="links" exit={{ opacity: 0, transition: { duration: 0.2 } }} className={`pointer-events-auto w-full shrink-0 sm:w-72 ${floating} motion-safe:animate-float-slow`}>
+            <motion.div key="links" exit="out" className={`pointer-events-auto w-full shrink-0 sm:w-72 ${floating} motion-safe:animate-float-slow`}>
               <motion.aside aria-label="Other ways to reach me" variants={small} initial="out" animate={phase} exit="out">
-                <ContactWindow title="Find me on" onClose={() => setShowLinks(false)} closeLabel="Hide these links" orbitDuration={11}>
+                <GlassWindow title="Find me on" onClose={() => setShowLinks(false)} closeLabel="Hide these links" orbitDuration={11}>
                   {links}
-                </ContactWindow>
+                </GlassWindow>
               </motion.aside>
             </motion.div>
           )}

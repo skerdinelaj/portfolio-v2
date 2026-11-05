@@ -3,12 +3,16 @@ import { FiX } from "react-icons/fi";
 import { OrbitEdge } from "@/components/ui/OrbitEdge";
 
 /**
- * A "celestial glass" window for the contact popup and page: a frosted card (the sun / moon glow shines through),
+ * A "celestial glass" window (contact popup and page, About): a frosted card (the sun / moon glow shines through),
  * a dashed orbit around its edge with a travelling dot, a quiet header (title + optional ✕) above a hairline.
- * No hooks of its own, so it renders on the server (the /contact page) and inside the client popup alike;
- * `onClose` is only passed from the popup.
+ * No hooks of its own, so it renders on the server and inside client components alike; `onClose` is only passed
+ * from the contact popup.
+ * Don't put it inside anything whose opacity animates (e.g. <Reveal>): the blur switches off under an ancestor with
+ * opacity < 1 and pops back at the end. To fade the window, set the CSS variable `--window-opacity` on an ancestor
+ * (the contact popup animates it): it's applied to the glass card and the orbit line *themselves*, and an element's
+ * own opacity doesn't switch off its blur.
  */
-export function ContactWindow({
+export function GlassWindow({
   title,
   titleId,
   heading: Heading = "h2",
@@ -28,8 +32,11 @@ export function ContactWindow({
 }) {
   return (
     <div className="relative">
-      <OrbitEdge radius={32} duration={orbitDuration} />
-      <div className="glass overflow-hidden rounded-3xl">
+      {/* opacity-(--window-opacity): when the variable isn't set, the declaration is invalid and opacity stays 1 */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-(--window-opacity)">
+        <OrbitEdge radius={32} duration={orbitDuration} />
+      </div>
+      <div className="glass overflow-hidden rounded-3xl opacity-(--window-opacity)">
         <div className="flex h-12 items-center justify-between gap-3 border-b border-foreground/10 pr-3 pl-6 sm:h-14">
           <Heading id={titleId} className="truncate text-xl font-semibold tracking-tight">
             {title}

@@ -12,12 +12,15 @@ export const profile = {
   /** Shown in the home top bar. Set to null to hide it. */
   status: "Open to work" as string | null,
   about: [
-    "Full stack developer with 5+ years of experience building production React and TypeScript applications.",
-    "At Okko I built a React Native / Expo social and jobs app together with its Node.js/Express backend (MongoDB, PostgreSQL). I bring strong React fundamentals (Redux, component architecture, API integration) to web and mobile, and deliver features end-to-end, including LLM-based features built on the Claude API.",
+    "Hey! Glad you made it here.",
+    "I built this website to experiment, play with design and ideas, and see where they take me. It’s also where I share what I make, put my years of experience in motion, and show a bit of the person behind the code.",
+    "It’s hard to sum myself up in one title. Developer, designer, AI engineer, ex-finance student who fell for code during COVID... all true. But at the end of the day, I just love turning messy ideas into things people actually enjoy using.",
+    "Outside of work, I live with my headphones on, usually playing Albanian music (give it a try, you’ll be impressed), and I try to stay active. I’ve rewatched The Big Bang Theory more times than I’d like to admit, and I share my home with Melek, my cat, who i think loves more my keyboard than me.",
+    "If any of this resonates with you, feel free to reach out. I’m always happy to meet new people and make new friends.",
   ],
   stats: [
     { value: 5, suffix: "+", label: "Years of experience" },
-    { value: 5, suffix: "", label: "Companies" },
+    { value: 40, suffix: "+", label: "Repositories" },
     { value: 10, suffix: "+", label: "Projects shipped" },
   ],
 };

@@ -115,16 +115,14 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Companies logo strip */
+/* Companies belt (About): the track holds the list twice; sliding it by exactly half (one copy) and restarting is a
+   seamless, endless loop. Keeps moving on hover. */
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
 .marquee-track {
   animation: marquee 30s linear infinite;
-}
-.marquee:hover .marquee-track {
-  animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
