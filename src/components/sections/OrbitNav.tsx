@@ -2,8 +2,9 @@
 
 import { animate, motion, useMotionValue, useReducedMotion, useTransform, type MotionValue, type PanInfo } from "motion/react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FiArrowRight, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { OrbitEdge } from "@/components/ui/OrbitEdge";
 
 /** Plain data only: this is a Client Component, so no icon components in props. */
 export type OrbitPage = { href: string; label: string; teaser: string };
@@ -106,18 +107,29 @@ function OrbitItem({
           }
         }}
         aria-current={isFront ? "true" : undefined}
-        className={`group flex flex-col items-center rounded-2xl bg-surface/90 px-5 py-3 text-center whitespace-nowrap shadow-lg ring-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent active:cursor-grabbing ${
-          isFront ? "ring-accent" : "cursor-grab ring-border"
+        // Warm paper, slightly see-through (80%, no blur: see `paper` in globals.css for why), so it looks the same
+        // at the front, while dragged and at the sides.
+        // Every card always holds its teaser and "Enter" (invisible unless it's the front card), so a card never changes
+        // size when it turns to the front: the extras and the orbit line just fade in. Opacity only.
+        className={`paper group relative flex flex-col items-center rounded-2xl px-5 py-3 text-center whitespace-nowrap transition-colors duration-500 hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent active:cursor-grabbing ${
+          isFront ? "" : "cursor-grab"
         }`}
       >
-        <span className="text-sm font-bold text-foreground">{String(index + 1).padStart(2, "0")}</span>
-        {isFront && <span className="mt-1 text-xs text-foreground">{page.teaser}</span>}
-        <span className="text-2xl font-medium tracking-tight transition-colors xl:text-3xl">{page.label}</span>
-        {isFront && (
-          <span className="mt-2 inline-flex items-center gap-1.5 bg-accent px-2.5 py-1 text-xs font-medium uppercase tracking-wider text-white dark:text-background">
-            Enter <FiArrowRight className="size-3" aria-hidden />
-          </span>
-        )}
+        <span aria-hidden className={`transition-opacity duration-700 ease-out ${isFront ? "opacity-100" : "opacity-0"}`}>
+          <OrbitEdge radius={24} duration={9} />
+        </span>
+        <span aria-hidden={!isFront} className={`text-xs text-foreground transition-opacity duration-500 ease-out ${isFront ? "opacity-100 delay-150" : "opacity-0"}`}>
+          {page.teaser}
+        </span>
+        <span className="mt-0.5 text-2xl font-medium tracking-tight xl:text-3xl">{page.label}</span>
+        <span
+          aria-hidden={!isFront}
+          className={`mt-2 inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-medium tracking-wider text-white uppercase transition-opacity duration-500 ease-out dark:text-background ${
+            isFront ? "opacity-100 delay-200" : "opacity-0"
+          }`}
+        >
+          Enter <FiArrowRight className="size-3" aria-hidden />
+        </span>
       </Link>
     </motion.div>
   );
@@ -132,6 +144,13 @@ export function OrbitNav({ pages }: { pages: OrbitPage[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const step = 360 / pages.length;
+  // While the ring is visible, mark <html> so globals.css can stop the page bounce. Layout-effect cleanup also runs
+  // when Next hides this page with <Activity> (Cache Components keeps visited pages around hidden).
+  useLayoutEffect(() => {
+    const html = document.documentElement;
+    html.setAttribute("data-orbit-lock", "");
+    return () => html.removeAttribute("data-orbit-lock");
+  }, []);
   const [turns, setTurns] = useState(0); // total steps taken; unbounded so the ring never jumps when wrapping
   const [size, setSize] = useState({ w: 0, h: 0 });
   const angle = useMotionValue(0);
@@ -292,7 +311,7 @@ export function OrbitNav({ pages }: { pages: OrbitPage[] }) {
     <nav
       ref={ref}
       aria-label="Pages"
-      data-orbit-nav // globals.css turns off page overscroll (Safari bounce) on desktop while this is on the page
+      data-orbit-nav
       className="pointer-events-none absolute inset-0 hidden lg:block"
       onKeyDown={(e) => {
         if (e.key === "ArrowRight") setTurns((t) => t + 1);
@@ -325,8 +344,9 @@ export function OrbitNav({ pages }: { pages: OrbitPage[] }) {
         <button type="button" onClick={() => setTurns((t) => t - 1)} aria-label="Previous page" className="grid size-8 place-items-center rounded-full border border-border bg-surface transition hover:border-accent">
           <FiChevronLeft className="size-4" />
         </button>
-        <span className="tabular-nums" aria-live="polite">
-          {String(front + 1).padStart(2, "0")} / {String(pages.length).padStart(2, "0")}
+        {/* No visible counter; screen readers still hear which page is at the front when the ring turns */}
+        <span className="sr-only" aria-live="polite">
+          {pages[front]?.label}
         </span>
         <button type="button" onClick={() => setTurns((t) => t + 1)} aria-label="Next page" className="grid size-8 place-items-center rounded-full border border-border bg-surface transition hover:border-accent">
           <FiChevronRight className="size-4" />

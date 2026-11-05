@@ -7,14 +7,13 @@ import { sitePages } from "@/data/pages";
 import { profile } from "@/data/profile";
 import type { SitePage } from "@/data/types";
 
-function PageLink({ page, index }: { page: SitePage; index: number }) {
+function PageLink({ page }: { page: SitePage }) {
   return (
     <Link
       href={page.href}
-      className="group flex w-full flex-col rounded-2xl border border-border bg-surface p-4 transition hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+      className="glass group flex w-full flex-col rounded-2xl p-4 transition hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
     >
-      <span className="text-sm font-bold text-foreground">{String(index + 1).padStart(2, "0")}</span>
-      <span className="mt-1 text-xs text-foreground">{page.teaser}</span>
+      <span className="text-xs text-foreground">{page.teaser}</span>
       <span className="mt-1 text-xl font-medium tracking-tight transition">{page.label}</span>
     </Link>
   );
@@ -35,7 +34,7 @@ export function HomeHub() {
           </Reveal>
 
           <div className="pointer-events-none absolute inset-x-0 top-[48%] flex flex-col items-center px-2 text-center">
-            <p className="rounded-sm bg-surface/90 px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] shadow-sm ring-1 ring-border sm:text-sm">
+            <p className="glass rounded-full px-4 py-1 text-xs font-medium uppercase tracking-[0.3em] sm:text-sm">
               <RoleCycler roles={profile.roles} />
             </p>
             {/* Theme text colour with a page-coloured outline (`text-outline`, globals.css): readable over any image */}
@@ -52,7 +51,7 @@ export function HomeHub() {
         <nav aria-label="Pages" className="grid grid-cols-2 gap-3 px-4 py-8 sm:px-6 lg:hidden">
           {sitePages.map((page, i) => (
             <Reveal key={page.href} x={i % 2 ? 24 : -24} delay={0.15 + i * 0.06} className="flex">
-              <PageLink page={page} index={i} />
+              <PageLink page={page} />
             </Reveal>
           ))}
         </nav>

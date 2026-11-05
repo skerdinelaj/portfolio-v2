@@ -171,7 +171,9 @@ export function TechGlobe({ items, children }: { items: GlobeItem[]; children: R
       onKeyDown={onKeyDown}
       // As big as the space under the header allows (height minus the 3.5rem header, or width), with a small margin.
       // touch-pan-y: on phones a vertical swipe still scrolls the page, a sideways swipe spins the globe.
-      className="relative aspect-square w-[min(calc(100dvh-5.5rem),calc(100vw-2rem))] cursor-grab touch-pan-y select-none rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent active:cursor-grabbing"
+      // isolate: the icons' z-index (up to 100, for depth) only orders them among themselves, so they can't rise
+      // above things outside the globe, like the contact popup (z-70).
+      className="relative isolate aspect-square w-[min(calc(100dvh-5.5rem),calc(100vw-2rem))] cursor-grab touch-pan-y select-none rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent active:cursor-grabbing"
     >
       {/* Soft light inside the globe, same glow as behind the avatar (sun / moon) */}
       <div aria-hidden className="absolute inset-[10%] rounded-full bg-linear-to-br from-glow-1 via-glow-2 to-glow-3 opacity-60 blur-2xl" />
@@ -182,7 +184,8 @@ export function TechGlobe({ items, children }: { items: GlobeItem[]; children: R
             ref={(el) => {
               itemRefs.current[i] = el;
             }}
-            className="absolute top-0 left-0 grid size-16 place-items-center rounded-full border border-border bg-surface text-foreground shadow-md transition-[border-color] will-change-transform hover:border-accent sm:size-20"
+            // glass-lite: the glass look without the background blur (17 bubbles move every frame; re-blurring would be costly)
+              className="glass-lite absolute top-0 left-0 grid size-16 place-items-center rounded-full text-foreground transition-[border-color] will-change-transform hover:border-accent sm:size-20"
           >
             {icons[i]}
             <span className="sr-only">

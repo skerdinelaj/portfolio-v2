@@ -89,6 +89,18 @@
   --color-glow-3: var(--glow-3);
   /* One font for the whole app: Fraunces (soft storybook serif). Its SOFT axis is set on <body> below. */
   --font-sans: var(--font-fraunces);
+  /* Floating cards (the contact popup): a slow bob with a little sway. Two speeds so neighbouring cards drift apart. */
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-slow: float 7.5s ease-in-out infinite;
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-0.4deg); }
+    50% { transform: translateY(-10px) rotate(0.4deg); }
+  }
+  /* A dot travelling along its offset-path (OrbitEdge); the duration is set per element */
+  --animate-orbit-edge: orbit-edge 16s linear infinite;
+  @keyframes orbit-edge {
+    to { offset-distance: 100%; }
+  }
 }
 
 html {
@@ -146,9 +158,11 @@ body {
   transition: none !important;
 }
 
-/* Home page on desktop: it never scrolls (the orbit ring owns the wheel), so stop Safari's rubber-band bounce */
+/* Home page on desktop: it never scrolls (the orbit ring owns the wheel), so stop Safari's rubber-band bounce.
+   A data attribute set by OrbitNav while it's visible, not html:has(): with Cache Components the home page stays in
+   the document (hidden) after you leave it, and :has() would keep matching on every other page. */
 @media (min-width: 1024px) {
-  html:has([data-orbit-nav]) {
+  html[data-orbit-lock] {
     overscroll-behavior: none;
   }
 }
@@ -158,6 +172,25 @@ body {
  * paint-order draws the stroke BEHIND the letters, so only its outer half shows and the letters keep their weight
  * (a plain stroke is centred on the edge and eats into the glyph). The faint shadow adds a little depth.
  */
+/*
+ * "Celestial glass": frosted, see-through surface so the sun / moon glow shines through, a soft halo in the glow
+ * colour instead of a hard shadow, and a hairline edge. Built from our tokens with @apply so the colour mixing is
+ * Tailwind's own (with fallbacks). `glass-lite` drops the blur for things that move every frame (the tech globe).
+ */
+@utility glass {
+  @apply border border-foreground/10 bg-surface/70 shadow-[0_28px_60px_-24px_var(--glow-1),0_10px_30px_-18px_rgb(0_0_0/0.25)] backdrop-blur-xl;
+}
+/* Warm, mostly solid card with the same hairline and halo as glass, for cards that move over the illustration (the
+   home ring): slightly see-through (80%), deliberately WITHOUT backdrop blur. The ring fades cards with opacity on an
+   ancestor, and a backdrop-filter under an ancestor with opacity < 1 can't see the page (the "backdrop root" rule):
+   the blur would only switch on at the exact front, so a card changed look when you grabbed / released it. */
+@utility paper {
+  @apply border border-foreground/10 bg-surface/80 shadow-[0_20px_44px_-22px_var(--glow-1),0_8px_22px_-16px_rgb(0_0_0/0.25)];
+}
+@utility glass-lite {
+  @apply border border-foreground/10 bg-surface/80 shadow-[0_14px_30px_-14px_var(--glow-1),0_6px_14px_-10px_rgb(0_0_0/0.25)];
+}
+
 @utility text-outline {
   -webkit-text-stroke: 0.09em var(--background);
   paint-order: stroke fill;

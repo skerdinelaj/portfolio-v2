@@ -38,14 +38,17 @@ src/
   app/
     layout.tsx         Root: <html>, fonts, theme script, MotionProvider, SiteHeader (one header for every route)
     page.tsx           Home hub (renders HomeHub). One screen below the header, no Footer
-    (pages)/           Route group for /about /experience /projects /reviews /contact
+    (pages)/           Route group for /about /experience /projects /reviews
       layout.tsx       ScrollProgress + <main> + Footer for every inner page
-    (fullscreen)/      Route group for one-screen pages (/tech): layout is just <main>, no Footer
+    (fullscreen)/      Route group for one-screen pages (/tech, /contact): layout is just <main>, no Footer
+    @modal/            Parallel-route slot rendered by the root layout: (.)contact = the contact popup (intercepted /contact);
+                       page.tsx + [...catchAll] + default.tsx return null so the popup closes on any other route
     globals.css        Tokens, dark mode, PhotoReveal + theme-switch + overscroll rules
   components/
     sections/          One component per page / big block (SiteHeader, PageMenu, HomeHub, OrbitNav, About, Projects, ...)
     ui/                Reusable building blocks (Section, Reveal, PhotoReveal, Timeline, ScrollProgress, ...)
   data/                Static content + types.ts (the content model). pages.ts lists the six pages
+  lib/contact.ts       "use server": sendMessage Server Action (validates, then emails via Resend)
 LEARNING.md            Learning journal: one entry per meaningful change (see Teaching mode)
 public/                avatar.webp (cut-out photo), avatar-illustration.webp (aligned illustration), projects/, logos/, ...
 ```
@@ -53,13 +56,14 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 - `src/app/` holds routing files only. Put components in `src/components/` and content in `src/data/`, not next to routes.
 - A new page: add `src/app/(pages)/<slug>/page.tsx` (export `metadata` with a `title`), put its content in `components/sections/<Name>.tsx` wrapped in `<Section eyebrow title>` (renders the page's single `<h1>`), and add it to `src/data/pages.ts`. That one list feeds the home ring, the mobile card grid and the header Menu.
 - Home page order and ring position come from the order in `pages.ts`.
+- Ring cards and the phone page cards show no numbers, and there is no "01 / 06" counter (an `sr-only` live region announces the front page instead). Every card always renders its teaser and "Enter"; non-front cards keep them at `opacity-0` + `aria-hidden`, so turning to the front is an opacity crossfade with no size change. Keep it that way (no conditional rendering of card content).
 - A component goes in `ui/` only when two or more sections use it, or it is a generic primitive. Otherwise keep it inside its section file.
 - Deeper routes (e.g. `/projects/[slug]`) go inside `(pages)/` so they get the shared layout; keep `data/` as the source of truth.
 
 ## Server vs. Client Components
 
 - Everything is a Server Component by default. Keep it that way.
-- Add `"use client"` only to the smallest leaf that needs state, effects, event handlers, browser APIs, or Motion. Existing client leaves: `Reveal`, `MotionProvider`, `RoleCycler`, `CountUp`, `ThemeToggle`, `LiveClock`, `PhotoReveal`, `Timeline`, `ScrollProgress`, `AutoHideHeader`, `PageMenu`, `OrbitNav`, `TechGlobe`.
+- Add `"use client"` only to the smallest leaf that needs state, effects, event handlers, browser APIs, or Motion. Existing client leaves: `Reveal`, `MotionProvider`, `RoleCycler`, `CountUp`, `ThemeToggle`, `LiveClock`, `PhotoReveal`, `Timeline`, `ScrollProgress`, `AutoHideHeader`, `PageMenu`, `OrbitNav`, `TechGlobe`, `ContactForm`, `ContactModal`, `OrbitEdge`.
 - The header is `SiteHeader` in the root layout, so it stays mounted across navigations. Don't add another header to a page or to `(pages)/layout.tsx`. It is `h-14`, and `HomeHub` subtracts that height on desktop (`h-[calc(100dvh-3.5rem)]`) so home never scrolls: change both together.
 - Never mark a whole section `"use client"` just to animate it. Wrap the animated part in `<Reveal>` or a dedicated client leaf, and pass server-rendered content as `children`.
 - Props passed into Client Components must be serializable. Don't pass react-icons components (functions) or other non-serializable values across the boundary. Render the icon on the server side, or pass a string key and resolve it inside the client component (see how `HomeHub` strips `icon` before passing pages to `OrbitNav`).
@@ -72,6 +76,17 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 - Components never hardcode copy that belongs in data (names, links, project text, stats). Put it in `src/data/` and import it.
 - Image paths in data are absolute from `/public` (e.g. `"/projects/foo.jpg"`). Optional fields (`logo`, `image`, `live`, `photo`) must have a sensible fallback in the UI.
 - Testimonials flagged `placeholder: true` are not real reviews. Never present them as genuine, and never invent new testimonials, employers, metrics, or experience.
+
+## Contact form (Server Action + Resend)
+
+- **It's a popup.** Every `<Link href="/contact">` (SN menu, home ring, mobile cards) is intercepted by `app/@modal/(.)contact` and opens `ContactModal` over the current page; the URL is `/contact`, so back / Esc / backdrop click close it with `router.back()`. A full load of `/contact` renders the real page (`(fullscreen)/contact`, the same two cards floating in the middle). Never special-case `/contact` links in components; the route does it. There is no floating contact button (removed on request).
+- The windows float (`motion-safe:animate-float` / `animate-float-slow` on a wrapper, never on the element Motion animates) and pause on hover or while focus is inside (`hover:` / `focus-within:[animation-play-state:paused]`). The popup focuses the dialog itself on open, not the first field, or the form window would never float.
+- The popup is **two "celestial glass" windows, centred and top-aligned**: `ContactWindow` (glass card, `OrbitEdge` around it, header with title + ✕; no hooks, so the server page uses it too) around the form (`ContactForm`: hairline rows TO / FROM / EMAIL / SUBJECT, the message, a sage pill) and around the links (`ContactLinks`: round icon bubbles; three tiles on phones). The form and links are passed into the client `ContactModal` as `children` and `links`; a sun/moon glow sits behind them. Closing the form window (✕ / Esc / backdrop) animates both out and *then* calls `router.back()`; the links window's ✕ only hides itself. Transient state is reset in a `useLayoutEffect` cleanup, because the closed popup stays mounted but hidden (see "Hidden pages").
+
+- `ContactForm` (client, `useActionState`) posts to `sendMessage` in `src/lib/contact.ts` (`"use server"`). Validation lives on the server (anyone can POST to an action); a hidden `website` honeypot field silently drops bots.
+- Mail goes through Resend's REST API with plain `fetch` (no SDK). The key is `RESEND_API_KEY` in `.env.local` (git-ignored) and in the Vercel project's env vars. Never prefix it with `NEXT_PUBLIC_`. `.env.example` documents it.
+- Sender is `onboarding@resend.dev`, which only delivers to the Resend account's own address (`profile.email`). Sending from your own domain needs a verified domain in Resend.
+- Without the key the form shows a friendly "email me directly" message and logs on the server.
 
 ## Data fetching and caching (when it is added)
 
@@ -93,14 +108,26 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
   - A new token goes in **three** places in `globals.css`: `:root`, `[data-theme="dark"]`, and the no-JS `prefers-color-scheme` fallback.
   - Any new text/background pair must pass **WCAG AA, 4.5:1** (3:1 for large text and UI shapes) in both themes. Measure it, don't eyeball it (see `LEARNING.md`, "Warm pastel palette").
 - Dark mode is driven by `data-theme` on `<html>`, set by the inline script in `layout.tsx` before first paint. `dark:` variants follow that attribute, not `prefers-color-scheme`. Don't remove that script or `suppressHydrationWarning`.
+- **Card style: "celestial glass"** (contact, home, tech so far; the other pages will be redone with it). Use the `glass` utility (frosted `bg-surface/70` + blur, hairline `border-foreground/10`, a soft halo in `--glow-1`) for cards, `glass-lite` (no blur) for things that move every frame, and `paper` (same hairline and halo, 80% opaque, **no blur**) for the home ring cards. Never put `backdrop-blur` on anything inside an element whose opacity animates (the ring fades cards by depth): under an ancestor with opacity < 1 the blur switches off, so the look flickers between states.
 - Layout: sections are `max-w-5xl` with `px-4 sm:px-6`. Design mobile-first and check that nothing scrolls horizontally at 360px.
 - **One font for the whole app: Fraunces** (variable, `axes: ["SOFT", "opsz"]`), loaded with `next/font/google` in `layout.tsx` and mapped to `--font-sans`. `"SOFT" 100` is set on `<body>`. Don't add a second font (no mono, no display font) or `font-mono`/`font-serif` classes. Never use a `<link>` to Google Fonts.
+
+## Layering
+
+- Global layers: header `z-50`, scroll progress `z-[60]`, contact popup `z-[70]`. Any component that uses its own z-index values internally (ring cards, globe icons) must sit inside an element with `isolate`, so those values only order its children and can never rise above the popup or header.
+
+## Hidden pages (Cache Components + Activity)
+
+- With `cacheComponents`, Next keeps up to 3 visited routes **in the DOM, hidden** (`display: none` via React `<Activity>`) instead of unmounting them; effects are cleaned up while hidden and re-run when shown (`node_modules/next/dist/docs/01-app/02-guides/preserving-ui-state.md`).
+- So: never use global `html:has(...)` / `body:has(...)` rules keyed on page content (a hidden page still matches). Set a `data-*` attribute on `<html>` in a `useLayoutEffect` and remove it in the cleanup (see `data-orbit-lock` in `OrbitNav`).
+- Transient UI (popups, success messages) should reset in a `useLayoutEffect` cleanup; DOM queries in tests must check visibility (`getClientRects().length`), not just existence.
 
 ## Animation
 
 - Use Motion (`motion/react`), never `framer-motion` imports.
 - Reuse `<Reveal>` for scroll-in effects before writing a new animation (it springs with a small overshoot; `x` slides sideways).
 - `/tech` is just the globe: it lives in the `(fullscreen)` route group (no Footer, no progress bar) and the globe is `min(100dvh − 5.5rem, 100vw − 2rem)` wide. If you change the header height, re-check that the page height equals the window height.
+- Contact is a **floating popup**, not a page you navigate to: see "Contact form" below.
 - Home page on desktop never scrolls: `OrbitNav` takes the wheel/trackpad/swipe (one step per gesture) and cancels it so Safari doesn't rubber-band. Don't add content that needs page scroll there at `lg` and up.
 - Scroll-linked values (`useScroll` → `style`) are not covered by `MotionConfig reducedMotion`; check `useReducedMotion()` yourself (see `Timeline`).
 - Theme switching disables all transitions for one frame (`data-theme-switching` in `ThemeToggle` + `globals.css`). Keep that so light/dark flips instantly.

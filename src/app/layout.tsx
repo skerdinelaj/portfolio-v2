@@ -23,7 +23,8 @@ export const metadata: Metadata = {
 // Runs before first paint: saved choice, else system preference. Prevents a theme flash.
 const themeScript = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+// `modal` is the @modal parallel-route slot: empty normally, the contact popup when /contact is intercepted
+export default function RootLayout({ children, modal }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {/* In the root layout so it stays mounted across every navigation (home included) */}
           <SiteHeader />
           {children}
+          {modal}
         </MotionProvider>
       </body>
     </html>
