@@ -16,7 +16,7 @@ export function About() {
         {/* Stage: glow, avatar and the orbiting stats. `isolate` keeps their z-index (bubbles behind / in front of the
             avatar) inside this box. The Reveal wraps the whole stage, so it doesn't split the avatar from the bubbles. */}
         <Reveal className="mx-auto w-full max-w-[34rem]">
-          <div className="relative isolate mx-auto aspect-square w-[min(100%,calc(100dvh-16rem))] min-w-64">
+          <div className="relative isolate mx-auto aspect-square w-[min(100%,calc(100dvh-18.5rem))] min-w-64">
             <div aria-hidden className="absolute inset-[14%] rounded-full bg-linear-to-br from-glow-1 via-glow-2 to-glow-3 opacity-80 blur-3xl" />
             <Image
               src={profile.illustration}
@@ -39,7 +39,7 @@ export function About() {
             tabIndex={0}
             role="region"
             aria-label="About me text"
-            className="space-y-3 p-5 text-base leading-relaxed outline-none focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-accent sm:p-6 lg:max-h-[calc(100dvh-17rem)] lg:overflow-y-auto lg:overscroll-contain lg:pb-12 lg:[scrollbar-width:thin] lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-3rem),transparent)] [@media(min-height:880px)]:space-y-4 [@media(min-height:880px)]:p-8 [@media(min-height:880px)]:text-lg"
+            className="space-y-3 p-5 text-base leading-relaxed outline-none focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-accent sm:p-6 lg:max-h-[calc(100dvh-19.5rem)] lg:overflow-y-auto lg:overscroll-contain lg:pb-12 lg:[scrollbar-width:thin] lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-3rem),transparent)] [@media(min-height:880px)]:space-y-4 [@media(min-height:880px)]:p-8 [@media(min-height:880px)]:text-lg"
           >
             {profile.about.map((p, i) => (
               <Reveal key={i} delay={0.1 + i * 0.1}>

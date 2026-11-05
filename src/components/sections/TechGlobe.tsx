@@ -169,11 +169,11 @@ export function TechGlobe({ items, children }: { items: GlobeItem[]; children: R
       role="group"
       aria-label="Tech globe. Drag or use the arrow keys to spin it."
       onKeyDown={onKeyDown}
-      // As big as the space under the header allows (height minus the 3.5rem header, or width), with a small margin.
+      // As big as the space under the header allows (height minus the 3.5rem header and 2.5rem page bar, or width), with a small margin.
       // touch-pan-y: on phones a vertical swipe still scrolls the page, a sideways swipe spins the globe.
       // isolate: the icons' z-index (up to 100, for depth) only orders them among themselves, so they can't rise
       // above things outside the globe, like the contact popup (z-70).
-      className="relative isolate aspect-square w-[min(calc(100dvh-5.5rem),calc(100vw-2rem))] cursor-grab touch-pan-y select-none rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent active:cursor-grabbing"
+      className="relative isolate aspect-square w-[min(calc(100dvh-8rem),calc(100vw-2rem))] cursor-grab touch-pan-y select-none rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent active:cursor-grabbing"
     >
       {/* Soft light inside the globe, same glow as behind the avatar (sun / moon) */}
       <div aria-hidden className="absolute inset-[10%] rounded-full bg-linear-to-br from-glow-1 via-glow-2 to-glow-3 opacity-60 blur-2xl" />

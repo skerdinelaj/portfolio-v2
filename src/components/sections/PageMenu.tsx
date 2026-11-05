@@ -59,6 +59,7 @@ export function PageMenu({ pages, avatar, initials }: { pages: MenuPage[]; avata
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        e.preventDefault(); // handled: PageBar's "Esc goes home" leaves it alone
         close();
         buttonRef.current?.focus();
         return;

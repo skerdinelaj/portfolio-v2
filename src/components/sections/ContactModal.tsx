@@ -63,7 +63,11 @@ export function ContactModal({ children, links }: { children: ReactNode; links: 
     // Move focus to the dialog itself (screen readers announce "Let's talk."; the next Tab lands in the form).
     // Not straight into the first field: the form card holds still while focus is inside it, so it wouldn't float.
     groupRef.current?.focus({ preventScroll: true });
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      e.preventDefault(); // handled: PageBar's "Esc goes home" leaves it alone
+      close();
+    };
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);

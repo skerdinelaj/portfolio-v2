@@ -10,3 +10,6 @@ export const sitePages: SitePage[] = [
   { href: "/reviews", label: "Reviews", teaser: "What colleagues say", icon: FiMessageSquare },
   { href: "/contact", label: "Contact", teaser: "Let's work together", icon: FiMail },
 ];
+
+/** Just the href and label: plain data that can be passed to Client Components (the icons are functions, which can't). */
+export const pageLinks = sitePages.map(({ href, label }) => ({ href, label }));
