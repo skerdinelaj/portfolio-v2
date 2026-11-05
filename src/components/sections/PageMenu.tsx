@@ -27,14 +27,14 @@ const isTyping = (t: EventTarget | null) => t instanceof HTMLElement && (t.isCon
 
 /**
  * Header menu: a small version of the home ring. The pages sit around the avatar like a clock dial
- * (01 at the top, clockwise) and spring out from the centre when it opens.
- * The trigger is the initials inside a tiny orbit of six dots. Shortcuts while open: 1–6 jump to a page, Esc closes.
+ * (first page at the top, then clockwise) and spring out from the centre when it opens.
+ * The trigger is the initials inside a tiny orbit of six dots. Shortcuts while open: 1–6 jump to the pages in that
+ * clockwise order, Esc closes.
  * It's a disclosure (a button with aria-expanded showing a <nav> of links), not an ARIA `role="menu"`.
  */
-export function PageMenu({ pages, avatar, name, initials }: { pages: MenuPage[]; avatar: string; name: string; initials: string }) {
+export function PageMenu({ pages, avatar, initials }: { pages: MenuPage[]; avatar: string; initials: string }) {
   const [open, setOpen] = useState(false);
   const [box, setBox] = useState({ size: MAX_SIZE, left: 8 });
-  const [hovered, setHovered] = useState<MenuPage | null>(null);
   const pathname = usePathname();
   const router = useRouter();
   const panelId = useId();
@@ -48,7 +48,6 @@ export function PageMenu({ pages, avatar, name, initials }: { pages: MenuPage[];
     const size = Math.min(MAX_SIZE, window.innerWidth - 16);
     const left = Math.max(8, Math.min((buttonRef.current?.offsetLeft ?? 0) + 8, window.innerWidth - size - 8));
     setBox({ size, left });
-    setHovered(null);
     setOpen((o) => !o);
   };
 
@@ -146,7 +145,6 @@ export function PageMenu({ pages, avatar, name, initials }: { pages: MenuPage[];
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: -6, transition: { duration: 0.15 } }}
               transition={SPRING}
-              onPointerLeave={() => setHovered(null)}
               style={{ width: size, height: size, left }}
               className="absolute top-full mt-2 origin-top-left overflow-hidden rounded-[2rem] border border-border bg-surface shadow-xl"
             >
@@ -194,22 +192,14 @@ export function PageMenu({ pages, avatar, name, initials }: { pages: MenuPage[];
                         href={page.href}
                         aria-current={here ? "page" : undefined}
                         onClick={() => setOpen(false)}
-                        onPointerEnter={() => setHovered(page)}
-                        onFocus={() => setHovered(page)}
                         className="flex -translate-1/2 items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-medium whitespace-nowrap shadow-sm transition hover:-translate-y-[calc(50%+3px)] hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent aria-[current=page]:border-accent aria-[current=page]:bg-accent-soft"
                       >
-                        <span className="text-[11px] font-bold text-foreground">{String(i + 1).padStart(2, "0")}</span>
                         {page.label}
                       </Link>
                     </motion.li>
                   );
                 })}
               </ul>
-
-              {/* Caption: what the hovered page is about */}
-              <p aria-hidden className="absolute inset-x-0 bottom-3 truncate px-6 text-center text-xs text-foreground">
-                {hovered ? hovered.teaser : `Pick a page · ${name}`}
-              </p>
             </motion.nav>
           </>
         )}
