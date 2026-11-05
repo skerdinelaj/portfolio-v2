@@ -3,13 +3,18 @@ import type { IconType } from "react-icons";
 export type Job = {
   company: string;
   companyNote?: string;
+  /** Shorter name for tight spots (the Experience star labels on small screens). Falls back to `company`. */
+  short?: string;
   role: string;
   start: string;
   end: string;
   /** Path under /public, e.g. "/logos/oracle.svg". Falls back to the company name. */
   logo?: string;
   url?: string;
-  highlights: { title: string; text: string; tech?: string[] }[];
+  /** The story of this job, as paragraphs: the company, my journey there, my role (top of the job popup). */
+  summary?: string[];
+  /** The projects I worked on: what each one is and what I did on it. No tech names (the user's choice). */
+  highlights: { title: string; text: string }[];
 };
 
 export type Tech = {

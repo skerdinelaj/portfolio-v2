@@ -38,15 +38,15 @@ src/
   app/
     layout.tsx         Root: <html>, fonts, theme script, MotionProvider, SiteHeader (one header for every route)
     page.tsx           Home hub (renders HomeHub). One screen below the header, no Footer
-    (pages)/           Route group for /experience /projects /reviews
+    (pages)/           Route group for /projects /reviews
       layout.tsx       ScrollProgress + <main> + Footer for every inner page
-    (fullscreen)/      Route group for one-screen pages (/about, /tech, /contact): layout is just <main>, no Footer
+    (fullscreen)/      Route group for one-screen pages (/about, /experience, /tech, /contact): layout is just <main>, no Footer
     @modal/            Parallel-route slot rendered by the root layout: (.)contact = the contact popup (intercepted /contact);
                        page.tsx + [...catchAll] + default.tsx return null so the popup closes on any other route
     globals.css        Tokens, dark mode, theme-switch + overscroll rules
   components/
     sections/          One component per page / big block (SiteHeader, PageMenu, HomeHub, OrbitNav, About, Projects, ...)
-    ui/                Reusable building blocks (Section, Reveal, PhotoReveal, Timeline, ScrollProgress, ...)
+    ui/                Reusable building blocks (Section, Reveal, PhotoReveal, GlassWindow, OrbitEdge, ScrollProgress, ...)
   data/                Static content + types.ts (the content model). pages.ts lists the six pages
   lib/contact.ts       "use server": sendMessage Server Action (validates, then emails via Resend)
 LEARNING.md            Learning journal: one entry per meaningful change (see Teaching mode)
@@ -63,7 +63,7 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 ## Server vs. Client Components
 
 - Everything is a Server Component by default. Keep it that way.
-- Add `"use client"` only to the smallest leaf that needs state, effects, event handlers, browser APIs, or Motion. Existing client leaves: `Reveal`, `MotionProvider`, `RoleCycler`, `CountUp`, `ThemeToggle`, `LiveClock`, `PhotoReveal`, `Timeline`, `ScrollProgress`, `AutoHideHeader`, `PageMenu`, `OrbitNav`, `TechGlobe`, `ContactForm`, `ContactModal`, `OrbitEdge`, `AboutOrbit`.
+- Add `"use client"` only to the smallest leaf that needs state, effects, event handlers, browser APIs, or Motion. Existing client leaves: `Reveal`, `MotionProvider`, `RoleCycler`, `CountUp`, `ThemeToggle`, `LiveClock`, `PhotoReveal`, `ScrollProgress`, `AutoHideHeader`, `PageMenu`, `OrbitNav`, `TechGlobe`, `ContactForm`, `ContactModal`, `OrbitEdge`, `AboutOrbit`, `Constellation`.
 - The header is `SiteHeader` in the root layout, so it stays mounted across navigations. Don't add another header to a page or to `(pages)/layout.tsx`. It is `h-14`, and `HomeHub` subtracts that height on desktop (`h-[calc(100dvh-3.5rem)]`) so home never scrolls: change both together.
 - Never mark a whole section `"use client"` just to animate it. Wrap the animated part in `<Reveal>` or a dedicated client leaf, and pass server-rendered content as `children`.
 - Props passed into Client Components must be serializable. Don't pass react-icons components (functions) or other non-serializable values across the boundary. Render the icon on the server side, or pass a string key and resolve it inside the client component (see how `HomeHub` strips `icon` before passing pages to `OrbitNav`).
@@ -128,9 +128,10 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 - Reuse `<Reveal>` for scroll-in effects before writing a new animation (it springs with a small overshoot; `x` slides sideways).
 - `/tech` is just the globe: it lives in the `(fullscreen)` route group (no Footer, no progress bar) and the globe is `min(100dvh − 5.5rem, 100vw − 2rem)` wide. If you change the header height, re-check that the page height equals the window height.
 - `/about` is one screen ("orbit of me"): the illustration on an `isolate` stage with the stats orbiting it (`AboutOrbit`: front half in front of the avatar, back half behind and faded; keeps orbiting on hover; positions set only in the browser), the bio in a `GlassWindow` (`h1` "About me"; the window itself is never inside a `Reveal`, its text is; on desktop the text box scrolls inside the window when it's taller than the space, with a bottom fade, `tabIndex={0}` + `role="region"` so keyboards can scroll it), and `Companies` as an endless belt of `glass-lite` pills in equal slots (5 across on xl, 4 lg, 3 md, 2 on phones; no gaps, so half the track is exactly one copy and the loop is seamless; it doesn't pause on hover). Phones stack it and may scroll a little.
+- `/experience` is one screen ("constellation"): the jobs are stars, oldest → newest (the data is newest first, so `Experience` reverses it), joined by a dashed path; a sage line fills the path up to the star under the pointer / keyboard focus, and otherwise to the last job opened (a `stroke-dasharray` as long as the path to it). Clicking a star opens that job in a popup that **grows out of the star's dot and shrinks back into it** (`transformOrigin` = the dot's position measured against the window's untransformed wrapper, then only `scale` animates; re-aimed at close): a native `<dialog>` with `showModal()` (top layer, page inert, Esc = `cancel`, which we intercept to animate out first), our own animated backdrop + glow inside it, and a `GlassWindow` faded via `--window-opacity`. `Constellation` (client) gets every job's popup content **pre-rendered on the server** as `panels` and only picks which one shows (the rest stay in the HTML, `hidden`). Job texts describe the role and the projects only: **no technology names or tags** (the user's choice). `Job.summary` (optional) is the "what I did there" intro. Absolute star `<li>`s carry the centring translate themselves (an untranslated positioned box widens the page on phones). The path is drawn in measured pixels (appears after hydration); the dust uses a seeded generator so server and client positions match. Labels use `Job.short` below `lg`; stars near the top (the peaks, `y < 40%`) put their label **above** the dot (CSS `order`, DOM order unchanged) so the path doesn't run through it.
 - Contact is a **floating popup**, not a page you navigate to: see "Contact form" below.
 - Home page on desktop never scrolls: `OrbitNav` takes the wheel/trackpad/swipe (one step per gesture) and cancels it so Safari doesn't rubber-band. Don't add content that needs page scroll there at `lg` and up.
-- Scroll-linked values (`useScroll` → `style`) are not covered by `MotionConfig reducedMotion`; check `useReducedMotion()` yourself (see `Timeline`).
+- Scroll-linked values (`useScroll` → `style`) are not covered by `MotionConfig reducedMotion`; check `useReducedMotion()` yourself.
 - Theme switching disables all transitions for one frame (`data-theme-switching` in `ThemeToggle` + `globals.css`). Keep that so light/dark flips instantly.
 - `MotionProvider` sets `reducedMotion="user"`. Keep every animation working with reduced motion: content must be visible and readable without the animation.
 - Animate `opacity` and `transform` only. Don't animate layout properties.
