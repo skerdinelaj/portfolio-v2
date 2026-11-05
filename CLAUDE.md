@@ -43,7 +43,7 @@ src/
     (fullscreen)/      Route group for one-screen pages (/about, /tech, /contact): layout is just <main>, no Footer
     @modal/            Parallel-route slot rendered by the root layout: (.)contact = the contact popup (intercepted /contact);
                        page.tsx + [...catchAll] + default.tsx return null so the popup closes on any other route
-    globals.css        Tokens, dark mode, PhotoReveal + theme-switch + overscroll rules
+    globals.css        Tokens, dark mode, theme-switch + overscroll rules
   components/
     sections/          One component per page / big block (SiteHeader, PageMenu, HomeHub, OrbitNav, About, Projects, ...)
     ui/                Reusable building blocks (Section, Reveal, PhotoReveal, Timeline, ScrollProgress, ...)
@@ -138,7 +138,7 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 ## Images, icons, assets
 
 - Use `next/image` for every image, with `width`/`height` (or `fill` + `sizes`) and a meaningful `alt` (`alt=""` only for decorative images). `priority` is deprecated in Next 16: for the above-the-fold hero image use `loading="eager"` or `fetchPriority="high"`, and leave every other image on the default lazy loading.
-- The home hero is `PhotoReveal`: `avatar-illustration.webp` is shown, and `avatar.webp` (the real photo) shows through a circle under the pointer. The two files must have the **exact same canvas size and framing** (currently 1242×1253), and the photo box in `HomeHub` uses that aspect ratio. Replacing either image means re-aligning the other (see `LEARNING.md`, "New avatar images").
+- The home hero is `PhotoReveal`: `avatar-illustration.webp` is shown, and `avatar.webp` (the real photo) replaces it under the pointer (hover circle) and along brush strokes, scratch-card style: revealed areas **erase** the illustration rather than layering the photo over it. While anything is revealed a `<canvas>` draws both (illustration with `destination-out` holes + photo through the mask) and the illustration `<img>` is hidden via `data-active`; when idle the plain `<img>` shows (it keeps the alt text and `fetchPriority`). The two files must have the **exact same canvas size and framing** (currently 1242×1253), and the photo box in `HomeHub` uses that aspect ratio. Replacing either image means re-aligning the other (see `LEARNING.md`, "New avatar images").
 - Put assets in the matching `public/` subfolder. Keep project screenshots under ~300 KB; prefer `.jpg`/`.webp` for photos.
 - Icons come from `react-icons` (`fi` for UI, `fa` for brands, `si` for tech logos). Don't add another icon library.
 
