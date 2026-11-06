@@ -24,8 +24,9 @@ type Stroke = { points: { x: number; y: number }[]; endedAt: number | null };
  *   3. the illustration with the mask cut out (`destination-out`), then the photo layer on top.
  * Meanwhile the illustration <img> is hidden (`data-active`). When nothing is revealed, the loop stops, the canvas is
  * cleared and the plain <img> shows again (it stays the high-priority image with the alt text).
- * The whole thing is `pointer-events: none`, so clicks and drags pass through to whatever sits behind it
- * (e.g. the back of the orbit ring). It follows the pointer through window listeners instead.
+ * On desktop the whole thing is `pointer-events: none`, so clicks and drags pass through to whatever sits behind it
+ * (e.g. the back of the orbit ring); it follows the pointer through window listeners instead. On phones it takes
+ * touches itself (`touch-action: pan-y`) so a finger can brush sideways while vertical swipes still scroll.
  * Both images must share the exact same canvas size and framing, or the reveal won't line up.
  */
 export function PhotoReveal({
@@ -63,7 +64,6 @@ export function PhotoReveal({
     let frame = 0;
     let last = 0;
     const hover = { x: 0, y: 0, r: 0, target: 0 };
-    const desktop = window.matchMedia("(min-width: 1024px)");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     // Match the canvases to the box (in device pixels, capped at 2x for cost)
@@ -196,8 +196,9 @@ export function PhotoReveal({
       move(e);
       const p = localPoint(e);
       const onCard = e.target instanceof Element && e.target.closest("a, button");
-      // Phones scroll on touch, so only brush with touch where the page doesn't scroll (desktop layout)
-      const canBrush = e.button === 0 && (e.pointerType !== "touch" || desktop.matches);
+      // Touch brushes too: on phones the photo is `touch-action: pan-y`, so a sideways drag brushes and an up/down
+      // swipe still scrolls the page (the browser then sends pointercancel, which ends the stroke)
+      const canBrush = e.button === 0;
       if (!p.inside || onCard || !canBrush) return;
       e.preventDefault(); // no text selection or native image drag while brushing
       active = { points: [{ x: p.x, y: p.y }], endedAt: null };
@@ -231,7 +232,7 @@ export function PhotoReveal({
   }, [radius]);
 
   return (
-    <div ref={ref} className="reveal-photo group pointer-events-none absolute inset-0">
+    <div ref={ref} className="reveal-photo group pointer-events-auto absolute inset-0 touch-pan-y lg:pointer-events-none lg:touch-auto">
       {/* The illustration is what everyone sees first, so it's the high-priority image and carries the alt text.
           Hidden while the canvas draws the revealed version of it (data-active). */}
       <Image
