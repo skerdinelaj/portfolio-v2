@@ -2,7 +2,7 @@ import { PageBar } from "@/components/ui/PageBar";
 import { pageLinks } from "@/data/pages";
 
 /**
- * Shell for one-screen pages (/about, /experience, /projects, /tech, /reviews, /contact): the page bar (title + Esc to home), no Footer and no scroll progress bar, and <main> fills the space
+ * Shell for one-screen pages (/about, /experience, /projects, /tech, /reviews, /contact): the page bar (title + Esc to home), and <main> fills the space
  * under the site header (which comes from the root layout). The group folder name doesn't appear in the URL.
  */
 export default function FullscreenLayout({ children }: LayoutProps<"/">) {
