@@ -50,7 +50,9 @@ const readColors = () => {
 /**
  * Tap-to-flap mini game on a <canvas>. All moving state lives in refs/locals inside one requestAnimationFrame loop, so
  * React only re-renders when the phase changes (ready → playing → over), never per frame.
- * Sizes and speeds are fractions of the canvas height, so it plays the same on a phone and a big screen.
+ * Sizes and speeds are fractions of one unit `u`: the canvas height, or 1.1× its width on a tall, narrow canvas (a phone),
+ * so the world isn't zoomed in there. Time between pillars (spacing ÷ speed) is the same at any size, which the
+ * leaderboard's MIN_SECONDS_PER_POINT relies on.
  */
 export function SkyHopGame({ onClose }: { onClose: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -109,11 +111,13 @@ export function SkyHopGame({ onClose }: { onClose: () => void }) {
 
     let w = 0;
     let h = 0;
+    let u = 0;
     const resize = () => {
       const r = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2); // sharp on retina, capped so big screens stay cheap
       w = r.width;
       h = r.height;
+      u = Math.min(h, w * 1.1);
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -136,9 +140,9 @@ export function SkyHopGame({ onClose }: { onClose: () => void }) {
     let overAt = 0;
     const bird = { y: h * 0.45, v: 0 };
 
-    const radius = () => Math.max(10, h * 0.035);
-    const birdX = () => Math.min(w * 0.28, h * 0.6);
-    const groundH = () => Math.max(16, h * 0.07);
+    const radius = () => Math.max(10, u * 0.035);
+    const birdX = () => Math.min(w * 0.28, u * 0.6);
+    const groundH = () => Math.max(16, u * 0.07);
 
     const flap = () => {
       if (state === "over") {
@@ -151,7 +155,7 @@ export function SkyHopGame({ onClose }: { onClose: () => void }) {
         state = "playing";
         setPhase("playing");
       }
-      bird.v = -0.78 * h;
+      bird.v = -0.78 * u;
     };
     flapRef.current = flap;
 
@@ -170,19 +174,19 @@ export function SkyHopGame({ onClose }: { onClose: () => void }) {
       t += dt;
       const r = radius();
       const floor = h - groundH();
-      const speed = h * 0.36;
-      const pw = Math.max(36, h * 0.11);
-      const gap = Math.max(r * 7, h * 0.3);
-      const spacing = Math.max(pw * 3.2, h * 0.62);
+      const speed = u * 0.36;
+      const pw = Math.max(36, u * 0.11);
+      const gap = Math.max(r * 7, u * 0.3);
+      const spacing = Math.max(pw * 3.2, u * 0.62);
 
       if (state === "ready") {
-        bird.y = h * 0.45 + Math.sin(t * 4) * h * 0.02;
+        bird.y = h * 0.45 + Math.sin(t * 4) * u * 0.02;
       } else if (state === "over") {
-        bird.v += h * 2.4 * dt;
+        bird.v += u * 2.4 * dt;
         bird.y = Math.min(bird.y + bird.v * dt, floor - r);
         return;
       } else {
-        bird.v += h * 2.4 * dt;
+        bird.v += u * 2.4 * dt;
         bird.y += bird.v * dt;
         if (bird.y < r) {
           bird.y = r;
@@ -193,7 +197,7 @@ export function SkyHopGame({ onClose }: { onClose: () => void }) {
         pillars = pillars.filter((p) => p.x > -pw);
         const last = pillars.at(-1);
         if (!last || last.x < w - spacing) {
-          const margin = gap / 2 + h * 0.06;
+          const margin = gap / 2 + u * 0.06;
           pillars.push({ x: w + pw, gapY: margin + Math.random() * (floor - 2 * margin), passed: false });
         }
 
@@ -217,7 +221,7 @@ export function SkyHopGame({ onClose }: { onClose: () => void }) {
 
     const drawBird = (x: number, y: number) => {
       const r = radius();
-      const tilt = state === "ready" ? 0 : Math.max(-0.5, Math.min(1.1, bird.v / (h * 1.2)));
+      const tilt = state === "ready" ? 0 : Math.max(-0.5, Math.min(1.1, bird.v / (u * 1.2)));
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(tilt);
@@ -279,8 +283,8 @@ export function SkyHopGame({ onClose }: { onClose: () => void }) {
 
     const draw = () => {
       const floor = h - groundH();
-      const pw = Math.max(36, h * 0.11);
-      const gap = Math.max(radius() * 7, h * 0.3);
+      const pw = Math.max(36, u * 0.11);
+      const gap = Math.max(radius() * 7, u * 0.3);
 
       const sky = ctx.createLinearGradient(0, 0, 0, floor);
       sky.addColorStop(0, colors.skyTop);
@@ -291,16 +295,16 @@ export function SkyHopGame({ onClose }: { onClose: () => void }) {
       // sun (light) / moon (dark): the same glow token the rest of the site uses
       ctx.fillStyle = colors.sun;
       ctx.beginPath();
-      ctx.arc(w - h * 0.16, h * 0.17, h * 0.08, 0, Math.PI * 2);
+      ctx.arc(w - u * 0.16, u * 0.17, u * 0.08, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.fillStyle = colors.cloud;
       ctx.globalAlpha = 0.85;
       for (const [fx, fy, s] of [[0.12, 0.2, 1], [0.5, 0.32, 0.7], [0.82, 0.12, 0.9]] as const) {
         const span = w + 200;
-        const cx = ((((fx * span - t * h * 0.04 * s) % span) + span) % span) - 100;
+        const cx = ((((fx * span - t * u * 0.04 * s) % span) + span) % span) - 100;
         const cy = fy * h;
-        const cr = h * 0.045 * s;
+        const cr = u * 0.045 * s;
         ctx.beginPath();
         ctx.arc(cx, cy, cr, 0, Math.PI * 2);
         ctx.arc(cx + cr * 1.1, cy - cr * 0.4, cr * 1.2, 0, Math.PI * 2);
@@ -344,15 +348,15 @@ export function SkyHopGame({ onClose }: { onClose: () => void }) {
       drawBird(birdX(), bird.y);
 
       if (state === "playing") {
-        ctx.font = `600 ${Math.round(h * 0.12)}px ${font}`;
+        ctx.font = `600 ${Math.round(u * 0.12)}px ${font}`;
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         ctx.lineJoin = "round";
-        ctx.lineWidth = Math.max(4, h * 0.012);
+        ctx.lineWidth = Math.max(4, u * 0.012);
         ctx.strokeStyle = colors.outline;
-        ctx.strokeText(String(score), w / 2, h * 0.06);
+        ctx.strokeText(String(score), w / 2, u * 0.06);
         ctx.fillStyle = colors.ink;
-        ctx.fillText(String(score), w / 2, h * 0.06);
+        ctx.fillText(String(score), w / 2, u * 0.06);
       }
     };
 
