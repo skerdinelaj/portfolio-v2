@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { FiExternalLink, FiGithub } from "react-icons/fi";
-import { ProjectWindows } from "@/components/sections/ProjectWindows";
+import { ProjectWindows } from "@/components/sections/projects/ProjectWindows";
 import { Tag } from "@/components/ui/Tag";
 import { projects } from "@/data/projects";
 

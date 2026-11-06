@@ -1,6 +1,6 @@
-import { ContactForm } from "@/components/sections/ContactForm";
-import { ContactLinks } from "@/components/sections/ContactLinks";
-import { ContactModal } from "@/components/sections/ContactModal";
+import { ContactForm } from "@/components/sections/contact/ContactForm";
+import { ContactLinks } from "@/components/sections/contact/ContactLinks";
+import { ContactModal } from "@/components/sections/contact/ContactModal";
 import { profile } from "@/data/profile";
 
 /**

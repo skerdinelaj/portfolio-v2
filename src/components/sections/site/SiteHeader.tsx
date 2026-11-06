@@ -1,5 +1,5 @@
-import { PageMenu } from "@/components/sections/PageMenu";
-import { SkyHop } from "@/components/sections/SkyHop";
+import { PageMenu } from "@/components/sections/site/PageMenu";
+import { SkyHop } from "@/components/sections/sky-hop/SkyHop";
 import { AutoHideHeader } from "@/components/ui/AutoHideHeader";
 import { LiveClock } from "@/components/ui/LiveClock";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { TechStack } from "@/components/sections/TechStack";
+import { TechStack } from "@/components/sections/tech/TechStack";
 
 export const metadata: Metadata = { title: "Tech Stack" };
 

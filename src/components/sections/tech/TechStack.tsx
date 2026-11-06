@@ -1,4 +1,4 @@
-import { TechGlobe } from "@/components/sections/TechGlobe";
+import { TechGlobe } from "@/components/sections/tech/TechGlobe";
 import { Reveal } from "@/components/ui/Reveal";
 import { techGroups } from "@/data/tech";
 

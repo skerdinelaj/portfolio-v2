@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { AboutOrbit } from "@/components/sections/AboutOrbit";
-import { Companies } from "@/components/sections/Companies";
+import { AboutOrbit } from "@/components/sections/about/AboutOrbit";
+import { Companies } from "@/components/sections/about/Companies";
 import { GlassWindow } from "@/components/ui/GlassWindow";
 import { Reveal } from "@/components/ui/Reveal";
 import { profile } from "@/data/profile";

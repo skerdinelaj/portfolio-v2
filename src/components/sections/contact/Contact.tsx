@@ -1,5 +1,5 @@
-import { ContactForm } from "@/components/sections/ContactForm";
-import { ContactLinks } from "@/components/sections/ContactLinks";
+import { ContactForm } from "@/components/sections/contact/ContactForm";
+import { ContactLinks } from "@/components/sections/contact/ContactLinks";
 import { GlassWindow } from "@/components/ui/GlassWindow";
 import { profile } from "@/data/profile";
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces } from "next/font/google";
-import { SiteHeader } from "@/components/sections/SiteHeader";
+import { SiteHeader } from "@/components/sections/site/SiteHeader";
 import { MotionProvider } from "@/components/ui/MotionProvider";
 import { profile } from "@/data/profile";
 import "./globals.css";

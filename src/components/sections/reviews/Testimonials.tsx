@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { FiFileText } from "react-icons/fi";
-import { QuoteOrbit } from "@/components/sections/QuoteOrbit";
+import { QuoteOrbit } from "@/components/sections/reviews/QuoteOrbit";
 import { Reveal } from "@/components/ui/Reveal";
 import { profile } from "@/data/profile";
 import { letterNote, referenceLetters, testimonials } from "@/data/testimonials";

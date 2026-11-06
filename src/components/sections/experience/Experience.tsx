@@ -1,4 +1,4 @@
-import { Constellation } from "@/components/sections/Constellation";
+import { Constellation } from "@/components/sections/experience/Constellation";
 import { experience } from "@/data/experience";
 
 const year = (date: string) => date.split(" ").at(-1) ?? date;

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { OrbitNav } from "@/components/sections/OrbitNav";
+import { OrbitNav } from "@/components/sections/home/OrbitNav";
 import { PhotoReveal } from "@/components/ui/PhotoReveal";
 import { Reveal } from "@/components/ui/Reveal";
 import { RoleCycler } from "@/components/ui/RoleCycler";
