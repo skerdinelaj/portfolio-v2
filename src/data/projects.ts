@@ -91,6 +91,7 @@ export const projects: Project[] = [
     summary: "A full-stack app to discover and share recipes, with sign-up and log-in.",
     tech: ["React", "TypeScript", "Node.js", "MongoDB"],
     image: "/projects/recipe-book.webp",
+    github: "https://github.com/skerdinelaj/recipes-app",
     live: "https://recipes-app-five-swart.vercel.app/",
     kind: "learning",
   },
