@@ -10,6 +10,9 @@ const BRUSH_FADE_MS = 2500;
 const MASK_SCALE = 0.25;
 // How fast the hover circle grows / shrinks (time constant of an ease-out, ~180 ms to settle)
 const HOVER_EASE_MS = 50;
+// Phones: a finger has to rest this long, moving less than HOLD_SLOP_PX, before it brushes (else it's a scroll)
+const HOLD_MS = 350;
+const HOLD_SLOP_PX = 10;
 
 type Stroke = { points: { x: number; y: number }[]; endedAt: number | null };
 
@@ -26,7 +29,8 @@ type Stroke = { points: { x: number; y: number }[]; endedAt: number | null };
  * cleared and the plain <img> shows again (it stays the high-priority image with the alt text).
  * On desktop the whole thing is `pointer-events: none`, so clicks and drags pass through to whatever sits behind it
  * (e.g. the back of the orbit ring); it follows the pointer through window listeners instead. On phones it takes
- * touches itself (`touch-action: pan-y`) so a finger can brush sideways while vertical swipes still scroll.
+ * touches itself: press and hold (HOLD_MS) starts a brush stroke and stops the page scrolling for that touch; a finger
+ * that moves first is a normal scroll (`touch-action: pan-y`).
  * Both images must share the exact same canvas size and framing, or the reveal won't line up.
  */
 export function PhotoReveal({
@@ -65,6 +69,12 @@ export function PhotoReveal({
     let last = 0;
     const hover = { x: 0, y: 0, r: 0, target: 0 };
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // A finger that's down on the photo but hasn't held long enough to brush yet
+    let pending: { id: number; x0: number; y0: number; x: number; y: number; timer: number } | null = null;
+    const cancelHold = () => {
+      if (pending) clearTimeout(pending.timer);
+      pending = null;
+    };
 
     // Match the canvases to the box (in device pixels, capped at 2x for cost)
     let w = 0;
@@ -183,8 +193,24 @@ export function PhotoReveal({
       return { x: e.clientX - box.left, y: e.clientY - box.top, inside: e.clientX >= box.left && e.clientY >= box.top && e.clientX <= box.right && e.clientY <= box.bottom };
     };
 
+    const startStroke = (x: number, y: number) => {
+      active = { points: [{ x, y }], endedAt: null };
+      strokes.push(active);
+      hover.x = x;
+      hover.y = y;
+      hover.target = radius;
+      ensureLoop();
+    };
+
     const move = (e: PointerEvent) => {
       const p = localPoint(e);
+      if (pending && e.pointerId === pending.id) {
+        pending.x = p.x;
+        pending.y = p.y;
+        if (Math.hypot(p.x - pending.x0, p.y - pending.y0) > HOLD_SLOP_PX) cancelHold(); // it's a scroll
+        return;
+      }
+      if (e.pointerType === "touch" && !active) return; // fingers reveal nothing until a hold starts a stroke
       if (active) active.points.push({ x: p.x, y: p.y });
       if (!p.inside) return hide(); // pointer is off the photo
       hover.x = p.x;
@@ -193,19 +219,28 @@ export function PhotoReveal({
       ensureLoop();
     };
     const down = (e: PointerEvent) => {
-      move(e);
       const p = localPoint(e);
       const onCard = e.target instanceof Element && e.target.closest("a, button");
-      // Touch brushes too: on phones the photo is `touch-action: pan-y`, so a sideways drag brushes and an up/down
-      // swipe still scrolls the page (the browser then sends pointercancel, which ends the stroke)
-      const canBrush = e.button === 0;
-      if (!p.inside || onCard || !canBrush) return;
+      if (e.pointerType === "touch") {
+        if (!p.inside || onCard || pending || active) return; // one brushing finger at a time
+        // Wait for the hold. If the finger moves first, the browser scrolls (pointercancel) or `move` cancels it.
+        const id = e.pointerId;
+        pending = { id, x0: p.x, y0: p.y, x: p.x, y: p.y, timer: 0 };
+        pending.timer = window.setTimeout(() => {
+          if (!pending || pending.id !== id) return;
+          const { x, y } = pending;
+          pending = null;
+          startStroke(x, y);
+        }, HOLD_MS);
+        return;
+      }
+      move(e);
+      if (!p.inside || onCard || e.button !== 0) return;
       e.preventDefault(); // no text selection or native image drag while brushing
-      active = { points: [{ x: p.x, y: p.y }], endedAt: null };
-      strokes.push(active);
-      ensureLoop();
+      startStroke(p.x, p.y);
     };
     const end = (e: PointerEvent) => {
+      if (pending && e.pointerId === pending.id) cancelHold();
       if (active) {
         active.endedAt = performance.now(); // its 5 s hold starts now
         active = null;
@@ -214,6 +249,18 @@ export function PhotoReveal({
     };
     const leaveWindow = (e: PointerEvent) => !e.relatedTarget && hide(); // mouse left the browser window
 
+    // Once a hold has started a stroke, this touch paints instead of scrolling. `touch-action` is fixed when the
+    // touch starts, so the only way to stop the scroll mid-touch is a non-passive touchmove that calls preventDefault.
+    const blockScroll = (e: TouchEvent) => {
+      if (active && e.cancelable) e.preventDefault();
+    };
+    // Long-press would also open Android's context menu (the iOS image callout is off in CSS)
+    const blockMenu = (e: Event) => {
+      if (pending || active) e.preventDefault();
+    };
+
+    el.addEventListener("touchmove", blockScroll, { passive: false });
+    el.addEventListener("contextmenu", blockMenu);
     window.addEventListener("pointerdown", down);
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", end);
@@ -221,7 +268,10 @@ export function PhotoReveal({
     document.addEventListener("pointerout", leaveWindow);
     return () => {
       cancelAnimationFrame(frame);
+      cancelHold();
       idle();
+      el.removeEventListener("touchmove", blockScroll);
+      el.removeEventListener("contextmenu", blockMenu);
       ro.disconnect();
       window.removeEventListener("pointerdown", down);
       window.removeEventListener("pointermove", move);
@@ -232,7 +282,7 @@ export function PhotoReveal({
   }, [radius]);
 
   return (
-    <div ref={ref} className="reveal-photo group pointer-events-auto absolute inset-0 touch-pan-y lg:pointer-events-none lg:touch-auto">
+    <div ref={ref} className="reveal-photo group pointer-events-auto absolute inset-0 touch-pan-y select-none [-webkit-touch-callout:none] lg:pointer-events-none lg:touch-auto">
       {/* The illustration is what everyone sees first, so it's the high-priority image and carries the alt text.
           Hidden while the canvas draws the revealed version of it (data-active). */}
       <Image
