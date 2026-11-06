@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { usePinHeader } from "@/components/ui/AutoHideHeader";
+import { BirdShapes } from "@/components/ui/Bird";
 import { SkyHopGame } from "./SkyHopGame";
 
 /**
@@ -67,17 +68,7 @@ export function SkyHop() {
               centre (SVG's default transform-box), which is the middle of the bird. */}
           <svg viewBox="0 0 40 36" className="h-7 w-8 transition-transform group-hover:-translate-y-0.5" aria-hidden>
             <g className="transition duration-200 group-hover:scale-x-0 group-hover:opacity-0 group-focus-visible:scale-x-0 group-focus-visible:opacity-0">
-              <g className="stroke-foreground" strokeWidth="1.6" strokeLinejoin="round">
-                <ellipse cx="17" cy="5.5" rx="2" ry="3.5" transform="rotate(-25 17 5.5)" className="fill-rose" />
-                <circle cx="18" cy="19" r="11" className="fill-butter" />
-                <ellipse cx="20" cy="23.5" rx="6" ry="4" className="fill-peach" strokeWidth="0" />
-                <g className="motion-safe:animate-wing origin-[14px_19px]">
-                  <ellipse cx="14" cy="19.5" rx="5.5" ry="3.2" className="fill-rose" />
-                </g>
-                <path d="M28 16.5 L35 19 L28 21.5 Z" className="fill-peach" />
-                <circle cx="23" cy="15.5" r="2.8" className="fill-surface" />
-              </g>
-              <circle cx="23.8" cy="15.5" r="1.2" className="fill-foreground" />
+              <BirdShapes />
             </g>
             <g className="scale-x-0 opacity-0 transition duration-200 group-hover:scale-x-100 group-hover:opacity-100 group-hover:delay-75 group-focus-visible:scale-x-100 group-focus-visible:opacity-100">
               <g className="stroke-foreground" strokeWidth="1.6" strokeLinejoin="round">

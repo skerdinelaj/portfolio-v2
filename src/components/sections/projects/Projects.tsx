@@ -37,7 +37,9 @@ export function Projects() {
                 width={1600}
                 height={900}
                 sizes="(min-width: 768px) 46rem, 100vw"
-                className="mt-3 h-auto w-full rounded-2xl border border-foreground/10"
+                // One frame for every project (2:1), so the popups match: screenshots are about 2:1 already, the square
+                // learning covers are cropped, kept a little above centre where the faces are
+                className="mt-3 aspect-[2/1] w-full rounded-2xl border border-foreground/10 object-cover object-[50%_25%]"
               />
             )}
             <p className="mt-4 text-base leading-relaxed sm:text-lg">{p.summary}</p>

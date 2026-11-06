@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import Image from "next/image";
 import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { Bird } from "@/components/ui/Bird";
 import { PopupWindow } from "@/components/ui/PopupWindow";
 
 type Kind = "work" | "learning";
@@ -137,24 +138,27 @@ export function ProjectWindows({ cards, panels }: { cards: Card[]; panels: React
                   </button>
                 </h2>
               </div>
-              {/* Desktop: the picture shares the screen height, so two rows of windows always fit */}
-              <div className="relative aspect-video overflow-hidden lg:aspect-auto lg:h-[clamp(4rem,calc(50dvh-18.75rem),10rem)]">
+              {/* The same 2:1 frame as the popup, so every screenshot (most are ~2:1) shows whole and at the same scale.
+                  Desktop caps the height to the screen so two rows of windows always fit. */}
+              <div className="relative aspect-[2/1] w-full overflow-hidden lg:max-h-[clamp(4rem,calc(50dvh-18.75rem),10rem)]">
                 {c.image ? (
                   <Image
                     src={c.image}
                     alt=""
                     fill
                     sizes="(min-width: 1024px) 23rem, (min-width: 640px) 50vw, 100vw"
-                    className="object-cover transition duration-500 group-hover:scale-105"
+                    className="object-cover object-[50%_25%] transition duration-500 group-hover:scale-105"
                   />
                 ) : (
-                  // No screenshot yet: the sun / moon glow with the project's initial
+                  // No screenshot yet: the Sky Hop bird hopping on the sun / moon glow
                   <div
                     aria-hidden
-                    className="grid size-full place-items-center bg-linear-to-br from-glow-1 via-glow-2 to-glow-3"
+                    // absolute inset-0, not size-full: the box's height comes from aspect-ratio / max-height, which a
+                    // percentage height can't resolve against, so the bird would take its default size and be cut off
+                    className="absolute inset-0 grid place-items-center bg-linear-to-br from-glow-1 via-glow-2 to-glow-3"
                   >
-                    <span className="text-5xl font-bold opacity-60 transition duration-500 group-hover:scale-110">
-                      {c.title[0]}
+                    <span className="motion-safe:animate-hop block h-[55%]">
+                      <Bird className="h-full w-auto transition duration-500 group-hover:scale-110" />
                     </span>
                   </div>
                 )}
