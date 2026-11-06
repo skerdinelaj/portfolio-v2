@@ -31,21 +31,8 @@ export function SkyHop() {
       setOpenOn(null);
       buttonRef.current?.focus();
     };
-    // A press anywhere outside the header (the page below the game) closes it too. Presses inside the header don't:
-    // the bird button toggles itself, and the menu / theme toggle should work without ending the run.
-    // Capture phase, so it still fires when something on the page stops the event's propagation.
-    const onPress = (e: PointerEvent) => {
-      const header = buttonRef.current?.closest("header");
-      if (e.target instanceof Node && header?.contains(e.target)) return;
-      if (document.querySelector("dialog[open]")) return;
-      setOpenOn(null); // no focus move: you clicked somewhere else on purpose
-    };
     document.addEventListener("keydown", onKey);
-    document.addEventListener("pointerdown", onPress, true);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("pointerdown", onPress, true);
-    };
+    return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
   const close = () => {
@@ -98,6 +85,23 @@ export function SkyHop() {
 
       <AnimatePresence>
         {open && (
+          // An invisible backdrop over the page below the header: a click there only closes the game and never reaches
+          // the link or card underneath (closing on the page's own pointerdown would still let its click through).
+          // The header isn't covered, so the menu and theme toggle keep working mid-run. It's not `fixed`: the header's
+          // backdrop-filter makes the header the containing block for fixed children anyway. It stays mounted during
+          // the exit animation, so a slow tap's click still lands on it.
+          <motion.div
+            key="backdrop"
+            aria-hidden
+            onClick={() => setOpenOn(null)} // no focus move: you clicked somewhere else on purpose
+            onWheel={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+            exit={{ opacity: 0, transition: { duration: 0.3 } }}
+            className="absolute inset-x-0 top-full h-dvh"
+          />
+        )}
+        {open && (
           // The outer box is fixed under the header and clips; the inner sheet slides down out of the navbar's bottom
           // edge and back up into it on close. Only `transform` animates (GPU-composited, no layout or repaint per
           // frame), and an ease-out tween instead of a spring: no overshoot that would show a gap under the header.
@@ -109,6 +113,7 @@ export function SkyHop() {
             onTouchStart={(e) => e.stopPropagation()}
             onTouchEnd={(e) => e.stopPropagation()}
             // pb-10 leaves room for the sheet's shadow inside the clip; pointer-events-none lets presses there reach the page
+            key="panel"
             className="pointer-events-none absolute inset-x-0 top-full overflow-hidden pb-10"
           >
             <motion.div
