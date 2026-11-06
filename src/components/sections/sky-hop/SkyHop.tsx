@@ -8,7 +8,8 @@ import { BirdShapes } from "@/components/ui/Bird";
 import { SkyHopGame } from "./SkyHopGame";
 
 /**
- * The bored little bird in the header. Clicking it drops a panel out of the header (header + panel = half the screen)
+ * The bored little bird in the header. Clicking it drops a panel out of the header (header + panel = 80% of the screen
+ * on phones, half of it from `md` up)
  * with the Sky Hop game in it. The panel is absolutely positioned against the sticky <header>, so opening it
  * overlays the page instead of pushing it down (no layout shift, and home's one-screen height maths stays intact).
  * This wrapper must stay un-positioned, or `absolute` would anchor to it instead of the header.
@@ -115,7 +116,7 @@ export function SkyHop() {
               animate={{ y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } }}
               exit={{ y: "-100%", transition: { duration: 0.3, ease: [0.55, 0, 0.75, 0.06] } }}
               // Solid background, no blur: the header already has a backdrop-filter, and a nested one can't see the page
-              className="pointer-events-auto h-[max(16rem,calc(50dvh-3.5rem))] border-b border-border bg-background shadow-[0_24px_40px_-24px_rgb(0_0_0/0.35)] will-change-transform"
+              className="pointer-events-auto h-[max(16rem,calc(80dvh-3.5rem))] md:h-[max(16rem,calc(50dvh-3.5rem))] border-b border-border bg-background shadow-[0_24px_40px_-24px_rgb(0_0_0/0.35)] will-change-transform"
             >
               <SkyHopGame onClose={close} />
             </motion.div>
