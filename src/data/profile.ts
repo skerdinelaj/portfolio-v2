@@ -1,6 +1,6 @@
 export const profile = {
   name: "Skerdi Nelaj",
-  roles: ["Full Stack Developer", "React & TypeScript Developer", "React Native Developer", "AI Integrations"],
+  roles: ["Full Stack Developer", "AI Engineer", "React Native Developer", "WordPress Developer"],
   tagline: "I build React and AI-powered products end-to-end, from UI to API to deployment.",
   email: "nskerdi@gmail.com",
   linkedin: "https://www.linkedin.com/in/skerdi-nelaj-289b651b7/",
