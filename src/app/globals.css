@@ -9,7 +9,6 @@
   --background: #fbf5ee;
   --surface: #fffaf5;
   --foreground: #33281f;
-  --muted: #6f6457;
   --border: #ecdfd2;
   --accent: #476f44;
   --accent-soft: #e6f0e1;
@@ -31,7 +30,6 @@
   --background: #1e1814;
   --surface: #29211c;
   --foreground: #f3ece2;
-  --muted: #bfb4a5;
   --border: #3d3129;
   --accent: #9fcb98;
   --accent-soft: #2c3a2a;
@@ -54,7 +52,6 @@
     --background: #1e1814;
     --surface: #29211c;
     --foreground: #f3ece2;
-    --muted: #bfb4a5;
     --border: #3d3129;
     --accent: #9fcb98;
     --accent-soft: #2c3a2a;
@@ -75,7 +72,6 @@
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
   --color-border: var(--border);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);

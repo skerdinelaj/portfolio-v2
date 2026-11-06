@@ -10,7 +10,6 @@ export type Job = {
   end: string;
   /** Path under /public, e.g. "/logos/oracle.svg". Falls back to the company name. */
   logo?: string;
-  url?: string;
   /** The story of this job, as paragraphs: the company, my journey there, my role (top of the job popup). */
   summary?: string[];
   /** The projects I worked on: what each one is and what I did on it. No tech names (the user's choice). */
@@ -47,9 +46,7 @@ export type Testimonial = {
   companies: string[];
   /** Their own words, added only once they've sent them */
   quote?: string;
-  role?: string;
   photo?: string;
-  linkedin?: string;
 };
 
 /** One titled part of a letter (the opening part has no heading). */
@@ -65,8 +62,6 @@ export type ReferenceLetter = {
   relation: string;
   /** As written on the letter, e.g. "30.09.2026" */
   date: string;
-  /** The line shown on the card */
-  excerpt: string;
   /** Short lines that orbit the avatar on /reviews. Each must be copied word for word from `body`. */
   highlights: string[];
   body: LetterSection[];

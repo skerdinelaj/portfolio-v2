@@ -25,8 +25,6 @@ export const referenceLetters: ReferenceLetter[] = [
     company: "Oracle Law Global",
     relation: "Director of the firm where I was frontend developer, 2024–2026",
     date: "30.09.2026",
-    excerpt:
-      "He is a capable and thoroughly reliable developer who writes careful code, communicates unusually well with non-technical colleagues, and can be trusted absolutely to deliver what he undertakes.",
     highlights: [
       "can be trusted absolutely to deliver what he undertakes",
       "communicates unusually well with non-technical colleagues",
@@ -73,7 +71,6 @@ export const referenceLetters: ReferenceLetter[] = [
     company: "Oracle Law Global · Okko",
     relation: "My project manager at Oracle Law Global and again on Okko",
     date: "12.10.2026",
-    excerpt: "I could hand him a feature as a product requirement and trust him to deliver all of it.",
     highlights: [
       "I could hand him a feature as a product requirement and trust him to deliver all of it.",
       "real ability in building practical AI tools",
