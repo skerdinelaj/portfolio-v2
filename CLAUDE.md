@@ -2,7 +2,7 @@
 
 # Portfolio v2: project rules
 
-Personal portfolio: a one-screen home hub plus six content pages. Next.js 16.4 (App Router, Turbopack), React 19.3, TypeScript (strict), Tailwind CSS v4, Motion, react-icons. No backend, database, or CMS: all content is static TypeScript in `src/data/`.
+Personal portfolio: a one-screen home hub plus six content pages. Next.js 16.4 (App Router, Turbopack), React 19.3, TypeScript (strict), Tailwind CSS v4, Motion, react-icons. Content is static TypeScript in `src/data/` (no CMS). The backend is Server Actions in `src/lib/` (`"use server"`): the contact form emails through Resend and the Sky Hop leaderboard stores scores in Upstash Redis. New backend features follow the same pattern (see "Data fetching and caching").
 
 ## Teaching mode (always on)
 
@@ -25,37 +25,11 @@ This project is also a course: the owner is an experienced React developer learn
 - `cacheComponents` and `partialPrefetching` are both enabled in `next.config.ts`. Caching, prerendering, and `<Link>` prefetching follow the Cache Components model (`01-app/01-getting-started/08-caching.md`), not the old `revalidate` / `dynamic` segment config model.
 - Don't add a dependency when the platform or an existing one already covers it. Ask before adding any new package.
 
-## Commands
+## File conventions
 
-- `npm run dev`: dev server (Turbopack)
-- `npm run build`: production build. Run it after non-trivial changes; it is the type check and prerender check.
-- `npm run lint`: ESLint (flat config, `next/core-web-vitals` + `next/typescript`). Must pass with no errors.
-
-## Directory layout
-
-```
-src/
-  app/
-    layout.tsx         Root: <html>, fonts, theme script, MotionProvider, SiteHeader (one header for every route)
-    page.tsx           Home hub (renders HomeHub). One screen below the header, no Footer
-    (pages)/           Route group for scrolling pages (none at the moment): ScrollProgress + PageBar + <main> + Footer
-      layout.tsx       ScrollProgress + PageBar + <main> + Footer for every inner page
-    (fullscreen)/      Route group for one-screen pages (/about, /experience, /projects, /tech, /reviews, /contact): layout is PageBar + <main>, no Footer
-    @modal/            Parallel-route slot rendered by the root layout: (.)contact = the contact popup (intercepted /contact);
-                       page.tsx + [...catchAll] + default.tsx return null so the popup closes on any other route
-    globals.css        Tokens, dark mode, theme-switch + overscroll rules
-  components/
-    sections/          One component per page / big block (SiteHeader, PageMenu, HomeHub, OrbitNav, About, Projects, ...)
-    ui/                Reusable building blocks (Section, Reveal, PhotoReveal, GlassWindow, PopupWindow, OrbitEdge, ScrollProgress, ...)
-  data/                Static content + types.ts (the content model). pages.ts lists the six pages
-  lib/contact.ts       "use server": sendMessage Server Action (validates, then emails via Resend)
-  lib/leaderboard.ts   "use server": Sky Hop top 5 in Upstash Redis (startRun ticket, getTopScores, submitScore)
-LEARNING.md            Learning journal: one entry per meaningful change (see Teaching mode)
-public/                avatar.webp (cut-out photo), avatar-illustration.webp (aligned illustration), projects/, logos/, ...
-```
-
+- `src/components/sections/` has **one folder per page** (`home`, `about`, `experience`, `projects`, `tech`, `reviews`, `contact`) holding every component that belongs only to that page, plus `site/` (header and menu: on every page) and `sky-hop/` (the header mini game). A new page-only component goes in its page's folder; one used by two or more pages goes in `ui/`.
 - `src/app/` holds routing files only. Put components in `src/components/` and content in `src/data/`, not next to routes.
-- A new page: add `src/app/(pages)/<slug>/page.tsx` (export `metadata` with a `title`), put its content in `components/sections/<Name>.tsx` wrapped in `<Section>` (scrolling pages; just width and padding), and add it to `src/data/pages.ts`. Its `label` there is the page's title: `PageBar` shows it as the page's `<h1>`, so pages render **no title of their own** (no eyebrow, no big heading). That one list feeds the home ring, the mobile card grid and the header Menu.
+- A new page: add `src/app/(fullscreen)/<slug>/page.tsx` (export `metadata` with a `title`), put its content in `components/sections/<page>/`, and add it to `src/data/pages.ts`. Pages are one screen (no footer, no page scroll on desktop). Its `label` there is the page's title: `PageBar` shows it as the page's `<h1>`, so pages render **no title of their own** (no eyebrow, no big heading). That one list feeds the home ring, the mobile card grid and the header Menu.
 - Home page order and ring position come from the order in `pages.ts`.
 - Ring cards and the phone page cards show no numbers, and there is no "01 / 06" counter (an `sr-only` live region announces the front page instead). Every card always renders its teaser and "Enter"; non-front cards keep them at `opacity-0` + `aria-hidden`, so turning to the front is an opacity crossfade with no size change. Keep it that way (no conditional rendering of card content).
 - A component goes in `ui/` only when two or more sections use it, or it is a generic primitive. Otherwise keep it inside its section file.
@@ -64,10 +38,10 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 ## Server vs. Client Components
 
 - Everything is a Server Component by default. Keep it that way.
-- Add `"use client"` only to the smallest leaf that needs state, effects, event handlers, browser APIs, or Motion. Existing client leaves: `Reveal`, `MotionProvider`, `RoleCycler`, `CountUp`, `ThemeToggle`, `LiveClock`, `PhotoReveal`, `ScrollProgress`, `AutoHideHeader`, `PageMenu`, `OrbitNav`, `TechGlobe`, `ContactForm`, `ContactModal`, `OrbitEdge`, `AboutOrbit`, `Constellation`, `PopupWindow`, `ProjectWindows`, `QuoteOrbit`, `PageBar`, `SkyHop`, `SkyHopGame`.
-- The header is `SiteHeader` in the root layout, so it stays mounted across navigations. Don't add another header to a page or to `(pages)/layout.tsx`. It is `h-14`, and `HomeHub` subtracts that height on desktop (`h-[calc(100dvh-3.5rem)]`) so home never scrolls: change both together.
+- Add `"use client"` only to the smallest leaf that needs state, effects, event handlers, browser APIs, or Motion.
+- The header is `SiteHeader` in the root layout, so it stays mounted across navigations. Don't add another header to a page or layout. It is `h-14`, and `HomeHub` subtracts that height on desktop (`h-[calc(100dvh-3.5rem)]`) so home never scrolls: change both together.
 - `SkyHop` (in `SiteHeader`) is the bouncing bird + "Bored? Click me!" bubble. It opens the Sky Hop canvas game in a panel absolutely positioned under the sticky header (`top-full`, header + panel = 50dvh), so it overlays the page with no layout shift. Its wrapper must stay un-positioned. It closes on Esc (with `preventDefault`), ✕, or any route change.
-- Every page except home has `PageBar` (`ui/`, client) under the header: the page's label from `pages.ts` on the left (the page's only `<h1>`), an "Esc · Home" link on the right, and the Esc key goes home. It's rendered by both route-group layouts and finds the page with `useSelectedLayoutSegment()`, not the URL (the contact popup sets the URL to `/contact` while the page underneath stays). It is `h-10`, so one-screen pages subtract header + bar = **6rem** (`TechGlobe`, `About`). Any other Esc handler (menu, popups) must call `e.preventDefault()` so the bar leaves that Esc alone; it also ignores Esc while a `<dialog>` is open or a field has focus.
+- Every page except home has `PageBar` (`ui/`, client) under the header: the page's label from `pages.ts` on the left (the page's only `<h1>`), an "Esc · Home" link on the right, and the Esc key goes home. It's rendered by the `(fullscreen)` layout and finds the page with `useSelectedLayoutSegment()`, not the URL (the contact popup sets the URL to `/contact` while the page underneath stays). It is `h-10`, so one-screen pages subtract header + bar = **6rem** (`TechGlobe`, `About`). Any other Esc handler (menu, popups) must call `e.preventDefault()` so the bar leaves that Esc alone; it also ignores Esc while a `<dialog>` is open or a field has focus.
 - Never mark a whole section `"use client"` just to animate it. Wrap the animated part in `<Reveal>` or a dedicated client leaf, and pass server-rendered content as `children`.
 - Props passed into Client Components must be serializable. Don't pass react-icons components (functions) or other non-serializable values across the boundary. Render the icon on the server side, or pass a string key and resolve it inside the client component (see how `HomeHub` strips `icon` before passing pages to `OrbitNav`).
 - Import data from `src/data/` in Server Components and pass only what's needed down to client leaves.
@@ -79,10 +53,12 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 - Components never hardcode copy that belongs in data (names, links, project text, stats). Put it in `src/data/` and import it.
 - Image paths in data are absolute from `/public` (e.g. `"/projects/foo.jpg"`). Optional fields (`logo`, `image`, `live`, `photo`) must have a sensible fallback in the UI.
 - A colleague in `testimonials.ts` without a `quote` shows as "Review on its way". Only add a `quote` the person actually sent; never write one for them, and never invent testimonials, employers, metrics, or experience.
+- Job texts and project cards name no technologies (tech tags appear only in the project popup). Review quotes (`ReferenceLetter.highlights`) must be copied word for word from that letter's `body`.
 - Reference letters are quoted in full from the signed letters, minus contact details, addresses, registration numbers and signatures. Don't edit their wording. Only put a PDF in `/public/letters` once those private details are removed from it.
 
 ## Contact form (Server Action + Resend)
 
+- `app/@modal/` also has `page.tsx` + `[...catchAll]` + `default.tsx` returning null, so the popup closes on any other route.
 - **It's a popup.** Every `<Link href="/contact">` (SN menu, home ring, mobile cards) is intercepted by `app/@modal/(.)contact` and opens `ContactModal` over the current page; the URL is `/contact`, so back / Esc / backdrop click close it with `router.back()`. A full load of `/contact` renders the real page (`(fullscreen)/contact`, the same two cards floating in the middle). Never special-case `/contact` links in components; the route does it. There is no floating contact button (removed on request).
 - The windows float (`motion-safe:animate-float` / `animate-float-slow` on a wrapper, never on the element Motion animates) and pause on hover or while focus is inside (`hover:` / `focus-within:[animation-play-state:paused]`). The popup focuses the dialog itself on open, not the first field, or the form window would never float.
 - The popup is **two "celestial glass" windows, centred and top-aligned**: `GlassWindow` (`ui/`: glass card, `OrbitEdge` around it, header with title + ✕; no hooks, so server pages use it too) around the form (`ContactForm`: hairline rows TO / FROM / EMAIL / SUBJECT, the message, a sage pill) and around the links (`ContactLinks`: round icon bubbles; three tiles on phones). The form and links are passed into the client `ContactModal` as `children` and `links`; a sun/moon glow sits behind them. Closing the form window (✕ / Esc / backdrop) animates both out and *then* calls `router.back()`; the links window's ✕ only hides itself. Transient state is reset in a `useLayoutEffect` cleanup, because the closed popup stays mounted but hidden (see "Hidden pages").
@@ -99,9 +75,9 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 - The nickname form sits in the game-over overlay, which lets taps through to the game: it needs `pointer-events-auto` and `onPointerDown` stopPropagation, or typing restarts the game.
 - To test, call the actions over HTTP with a `Next-Action` header (IDs in `.next/server/server-reference-manifest.json`), then delete the test keys (`skyhop:*`) from Redis.
 
-## Data fetching and caching (when it is added)
+## Data fetching and caching
 
-- The site is fully static today. Keep the page prerenderable.
+- Pages are prerendered (static shell); the backend only runs in Server Actions. Keep pages prerenderable.
 - For any async data (GitHub API, CMS, etc.): put the fetch in a function in `src/data/` or `src/lib/`, add `"use cache"` plus a `cacheLife(...)` profile to it, and call it from a Server Component.
 - Uncached or request-time data (`cookies()`, `headers()`, `searchParams`) must sit inside a `<Suspense>` boundary with a real fallback, so the static shell still prerenders.
 - Use Server Actions (`"use server"`) for mutations such as a contact form, with input validation on the server. Don't add a Route Handler unless an external client needs an HTTP endpoint.
@@ -111,8 +87,8 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 
 - Tailwind v4 utilities only. No CSS modules, styled-components, or inline `style` except for values computed at runtime.
 - Palette is **warm pastel**. Use the design tokens from `globals.css`:
-  - **All text uses `text-foreground`** (espresso in light mode, cream in dark mode). No `text-muted`/`text-accent` and no colour change on hover: show hover with borders, lift or underline instead. Hierarchy comes from size and weight.
-  - UI shapes: `background`, `surface`, `border`, `accent` (sage: buttons, timeline, orbit dots, progress bar, hover borders, focus rings), `accent-soft` (tag/pill fills), `positive`. `muted` is kept in the tokens but not used for text.
+  - **All text uses `text-foreground`** (espresso in light mode, cream in dark mode). No `text-accent` and no colour change on hover: show hover with borders, lift or underline instead. Hierarchy comes from size and weight.
+  - UI shapes: `background`, `surface`, `border`, `accent` (sage: buttons, timeline, orbit dots, progress bar, hover borders, focus rings), `accent-soft` (tag/pill fills), `positive`.
   - Decoration only, never text (too light for contrast): `peach`, `butter`, `rose`, `sage`, and `glow-1/2/3` (the light behind the avatar: sun pastels in light mode, moonlight blues in dark mode).
   - Never hardcode hex or Tailwind palette colours (`bg-emerald-500` and the like) in components.
   - Exception that lives in **data**, not components: brand logo colours (`color` on each `Tech` in `src/data/tech.ts`, passed to react-icons' `color` prop). Black logos have no `color` so they follow the text colour in dark mode.
@@ -125,7 +101,7 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 
 ## Layering
 
-- Global layers: header `z-50`, scroll progress `z-[60]`, contact popup `z-[70]`. Any component that uses its own z-index values internally (ring cards, globe icons) must sit inside an element with `isolate`, so those values only order its children and can never rise above the popup or header.
+- Global layers: header `z-50`, contact popup `z-[70]`. Any component that uses its own z-index values internally (ring cards, globe icons) must sit inside an element with `isolate`, so those values only order its children and can never rise above the popup or header.
 
 ## Hidden pages (Cache Components + Activity)
 
@@ -137,7 +113,7 @@ public/                avatar.webp (cut-out photo), avatar-illustration.webp (al
 
 - Use Motion (`motion/react`), never `framer-motion` imports.
 - Reuse `<Reveal>` for scroll-in effects before writing a new animation (it springs with a small overshoot; `x` slides sideways).
-- `/tech` is just the globe: it lives in the `(fullscreen)` route group (no Footer, no progress bar) and the globe is `min(100dvh − 8rem, 100vw − 2rem)` wide. If you change the header or page bar height, re-check that the page height equals the window height.
+- `/tech` is just the globe: it lives in the `(fullscreen)` route group and the globe is `min(100dvh − 8rem, 100vw − 2rem)` wide. If you change the header or page bar height, re-check that the page height equals the window height.
 - `/about` is one screen ("orbit of me"): the illustration on an `isolate` stage with the stats orbiting it (`AboutOrbit`: front half in front of the avatar, back half behind and faded; keeps orbiting on hover; positions set only in the browser), the bio in a `GlassWindow` with no title bar (no "About me" heading; the window itself is never inside a `Reveal`, its text is; on desktop the text box scrolls inside the window when it's taller than the space, with a bottom fade, `tabIndex={0}` + `role="region"` so keyboards can scroll it), and `Companies` as an endless belt of `glass-lite` pills in equal slots (5 across on xl, 4 lg, 3 md, 2 on phones; no gaps, so half the track is exactly one copy and the loop is seamless; it doesn't pause on hover). Phones stack it and may scroll a little.
 - `/experience` is one screen ("constellation"): the jobs are stars, oldest → newest (the data is newest first, so `Experience` reverses it), joined by a dashed path; a sage line fills the path up to the star under the pointer / keyboard focus, and otherwise to the last job opened (a `stroke-dasharray` as long as the path to it). Clicking a star opens that job in a `PopupWindow` (see below) that grows out of the star's dot. `Constellation` (client) gets every job's popup content **pre-rendered on the server** as `panels` and only picks which one shows (the rest stay in the HTML, `hidden`). Job texts describe the role and the projects only: **no technology names or tags** (the user's choice). `Job.summary` (optional) is the "what I did there" intro. Absolute star `<li>`s carry the centring translate themselves (an untranslated positioned box widens the page on phones). The path is drawn in measured pixels (appears after hydration); the dust uses a seeded generator so server and client positions match. Labels use `Job.short` below `lg`; stars near the top (the peaks, `y < 40%`) put their label **above** the dot (CSS `order`, DOM order unchanged) so the path doesn't run through it.
 - `PopupWindow` (`ui/`, client) is the shared "grow out of what you clicked" popup (Experience stars, Projects windows): a native `<dialog>` with `showModal()` (top layer above the header, page inert, Esc = `cancel`, intercepted to animate out first), our own animated backdrop + sun/moon glow inside it, and a `GlassWindow` faded via `--window-opacity`. The parent owns `open`, passes `origin` (a function returning the element to grow from; read at open and at close) and `onClosed`. It sets `transformOrigin` to that element's centre, measured against the window's untransformed wrapper, and animates only `scale`. It uses `useEffectEvent` so the parent's callbacks aren't effect dependencies; its effect cleanup also handles the page being hidden by `<Activity>`.
