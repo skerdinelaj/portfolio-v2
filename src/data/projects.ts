@@ -86,6 +86,15 @@ export const projects: Project[] = [
     kind: "work",
   },
   {
+    slug: "recipe-book",
+    title: "RecipeBook",
+    summary: "A full-stack app to discover and share recipes, with sign-up and log-in.",
+    tech: ["React", "TypeScript", "Node.js", "MongoDB"],
+    image: "/projects/recipe-book.webp",
+    live: "https://recipes-app-five-swart.vercel.app/",
+    kind: "learning",
+  },
+  {
     slug: "react-mentoring",
     title: "React Mentoring",
     summary: "Final project from a React mentoring program.",

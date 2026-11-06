@@ -103,7 +103,7 @@ export function ProjectWindows({ cards, panels }: { cards: Card[]; panels: React
         initial={switched ? { opacity: 0, y: 14 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
-        className={`grid w-full flex-1 content-center gap-5 py-4 sm:grid-cols-2 lg:gap-6 ${tab === "work" ? "lg:grid-cols-4" : "lg:mx-auto lg:max-w-5xl lg:grid-cols-3"}`}
+        className="grid w-full flex-1 content-center gap-5 py-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6"
       >
         {shown.map(({ card: c, index: i }, pos) => (
           // The bob lives on the <li>, the hover lift on the window inside: both use `transform`, so they need
