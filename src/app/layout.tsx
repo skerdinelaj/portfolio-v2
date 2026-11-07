@@ -3,6 +3,7 @@ import { Fraunces } from "next/font/google";
 import { SiteHeader } from "@/components/sections/site/SiteHeader";
 import { MotionProvider } from "@/components/ui/MotionProvider";
 import { profile } from "@/data/profile";
+import { siteUrl } from "@/data/site";
 import "./globals.css";
 
 // The app's only font. Variable font: weights plus the extra SOFT (rounded corners) and opsz (optical size) axes
@@ -12,12 +13,23 @@ const fraunces = Fraunces({
   axes: ["SOFT", "opsz"],
 });
 
+const description = `${profile.name}, ${profile.roles.join(", ")}. ${profile.tagline}`;
+
 export const metadata: Metadata = {
+  // Absolute base for every URL in metadata (Open Graph links, etc.)
+  metadataBase: new URL(siteUrl),
   title: {
-    default: `${profile.name}: Full Stack Developer`,
+    default: `${profile.name}: ${profile.roles[0]}`,
     template: `%s · ${profile.name}`,
   },
-  description: profile.tagline,
+  description,
+  authors: [{ name: profile.name, url: siteUrl }],
+  openGraph: {
+    type: "website",
+    siteName: profile.name,
+    title: `${profile.name}: ${profile.roles[0]}`,
+    description,
+  },
 };
 
 // Runs before first paint: saved choice, else system preference. Prevents a theme flash.

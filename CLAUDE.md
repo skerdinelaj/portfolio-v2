@@ -137,6 +137,7 @@ This project is also a course: the owner is an experienced React developer learn
 
 - Metadata is defined via the `metadata` export in `layout.tsx` and built from `src/data/profile.ts`. Don't use a manual `<head>`.
 - Use file-based metadata (`opengraph-image`, `icon`, `sitemap.ts`, `robots.ts`) in `src/app/` per `14-metadata-and-og-images.md`.
+- The absolute site URL is `siteUrl` in `src/data/site.ts` (`server-only`), from Vercel's `VERCEL_PROJECT_PRODUCTION_URL` (localhost fallback). It feeds `metadataBase`, `sitemap.ts`, `robots.ts` and the home page's JSON-LD `Person` (name, titles, `sameAs` LinkedIn/GitHub). Never hard-code the domain. `sitemap.ts` is built from `pages.ts`, so new pages appear in it automatically. Don't put `alternates.canonical` or `openGraph.url` in the root layout: they'd apply to every page.
 
 ## TypeScript and code style
 
