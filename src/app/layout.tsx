@@ -3,7 +3,7 @@ import { Fraunces } from "next/font/google";
 import { SiteHeader } from "@/components/sections/site/SiteHeader";
 import { MotionProvider } from "@/components/ui/MotionProvider";
 import { profile } from "@/data/profile";
-import { siteUrl } from "@/data/site";
+import { googleSiteVerification, siteUrl } from "@/data/site";
 import "./globals.css";
 
 // The app's only font. Variable font: weights plus the extra SOFT (rounded corners) and opsz (optical size) axes
@@ -30,6 +30,7 @@ export const metadata: Metadata = {
     title: `${profile.name}: ${profile.roles[0]}`,
     description,
   },
+  verification: { google: googleSiteVerification },
 };
 
 // Runs before first paint: saved choice, else system preference. Prevents a theme flash.

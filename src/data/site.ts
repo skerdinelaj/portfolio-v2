@@ -8,3 +8,6 @@ import "server-only";
 export const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
   ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
   : "http://localhost:3000";
+
+/** Google Search Console ownership check (HTML tag method) for skerdi-nelaj.vercel.app. Keep it while the property exists. */
+export const googleSiteVerification = "jpT7esQLEoyzLYrQVCDOr6ULd_JhdoVpIhLFFHQmH8o";
