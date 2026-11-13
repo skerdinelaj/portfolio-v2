@@ -38,6 +38,9 @@ export function ProjectWindows({ cards, panels }: { cards: Card[]; panels: React
 
   // Keep each card's index in the full list: it's the index of its panel and of its window ref
   const shown = cards.map((card, index) => ({ card, index })).filter(({ card }) => card.kind === tab);
+  // Desktop shows two rows of four; more scroll inside the grid. The fades (bottom: "more below", top: inside the
+  // 1rem padding, so it only touches cards once scrolled) are only added then
+  const overflows = shown.length > 8;
 
   const choose = (kind: Kind) => {
     setTab(kind);
@@ -104,7 +107,9 @@ export function ProjectWindows({ cards, panels }: { cards: Card[]; panels: React
         initial={switched ? { opacity: 0, y: 14 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
-        className="grid w-full flex-1 content-center gap-5 py-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6"
+        className={`grid w-full flex-1 content-center gap-5 py-4 sm:grid-cols-2 lg:-mx-2 lg:min-h-0 lg:w-[calc(100%+1rem)] lg:overflow-y-auto lg:overscroll-contain lg:px-2 lg:[align-content:safe_center] lg:[scrollbar-width:thin] lg:grid-cols-4 lg:gap-6 ${
+          overflows ? "lg:pb-12 lg:[mask-image:linear-gradient(to_bottom,transparent,black_1rem,black_calc(100%-3rem),transparent)]" : ""
+        }`}
       >
         {shown.map(({ card: c, index: i }, pos) => (
           // The bob lives on the <li>, the hover lift on the window inside: both use `transform`, so they need
@@ -139,7 +144,7 @@ export function ProjectWindows({ cards, panels }: { cards: Card[]; panels: React
                 </h2>
               </div>
               {/* The same 2:1 frame as the popup, so every screenshot (most are ~2:1) shows whole and at the same scale.
-                  Desktop caps the height to the screen so two rows of windows always fit. */}
+                  Desktop caps the height to the screen so two rows of windows always fit; further rows scroll. */}
               <div className="relative aspect-[2/1] w-full overflow-hidden lg:max-h-[clamp(4rem,calc(50dvh-18.75rem),10rem)]">
                 {c.image ? (
                   <Image

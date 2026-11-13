@@ -14,7 +14,8 @@ const linkPill =
  */
 export function Projects() {
   return (
-    <section className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-4 sm:px-6 [@media(min-height:880px)]:py-6">
+    // Desktop: exactly the window height minus header + page bar (6rem), so the grid below can scroll inside it
+    <section className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-4 sm:px-6 lg:h-[calc(100dvh-6rem)] lg:flex-none [@media(min-height:880px)]:py-6">
       <ProjectWindows
         cards={projects.map(({ slug, title, company, summary, image, kind }) => ({
           slug,
