@@ -9,7 +9,7 @@ export const projects: Project[] = [
     company: "Oracle Law Global",
     summary:
       "A platform made of several tabs. One of them, Aero Defender AI, automatically generates legal defense drafts for flight-related cases. In testing, it cut estimated drafting time per case from ~2 hours to 15–20 minutes.",
-    tech: ["React", "TypeScript", "Python", "Claude API"],
+    tech: ["Angular", "TypeScript", "Node.js", "Python", "Claude API"],
     // Private details (a colleague's name and email, the firm's claim figures) are blurred in the screenshot
     image: "/projects/aero-claim-pro.webp",
     live: "https://aeroclaimpro.com/signin",
@@ -21,9 +21,20 @@ export const projects: Project[] = [
     company: "Oracle Law Global",
     summary:
       "Led the rebrand from Oracle Solicitors to Oracle Law Global and rebuilt the firm's website. I manage its hosting, SSL/DNS, SEO and GDPR compliance.",
-    tech: ["WordPress", "Elementor"],
+    tech: ["WordPress", "Elementor", "Plesk", "IONOS"],
     image: "/projects/oracle-law-global.webp",
     live: "https://oraclelawglobal.com",
+    kind: "work",
+  },
+  {
+    slug: "compass-claims",
+    title: "Compass Claims",
+    company: "Oracle Law Global",
+    summary:
+      "The website of Compass Claims, a personal injury claims company offering accident management, vehicle replacement and no-win-no-fee legal support. I designed, built and deployed it.",
+    tech: ["Next.js", "Tailwind CSS", "IONOS"],
+    image: "/projects/compass-claims.webp",
+    live: "https://compassclaims.co.uk",
     kind: "work",
   },
   {
@@ -81,8 +92,8 @@ export const projects: Project[] = [
     slug: "cqs",
     title: "CQS",
     company: "Linfa SH.P.K",
-    summary: "An application allowing bank employees to take out payroll-deducted loans.",
-    tech: ["C#", "Bootstrap"],
+    summary: "A bank application allowing employees to take out payroll-deducted loans. I worked on it and renewed its styling.",
+    tech: ["Angular", "Bootstrap"],
     kind: "work",
   },
   {
