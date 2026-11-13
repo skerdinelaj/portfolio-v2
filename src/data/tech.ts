@@ -1,5 +1,6 @@
 import { FaAws } from "react-icons/fa";
 import {
+  SiAngular,
   SiBootstrap,
   SiClaude,
   SiCss,
@@ -24,6 +25,7 @@ export const techGroups: TechGroup[] = [
     category: "Frontend",
     items: [
       { name: "React", icon: SiReact, level: "Experienced", color: "#149eca" },
+      { name: "Angular", icon: SiAngular, level: "Intermediate", color: "#dd0031" },
       { name: "TypeScript", icon: SiTypescript, level: "Experienced", color: "#3178c6" },
       { name: "JavaScript", icon: SiJavascript, level: "Experienced", color: "#e8c600" },
       { name: "Redux", icon: SiRedux, level: "Experienced", color: "#764abc" },
